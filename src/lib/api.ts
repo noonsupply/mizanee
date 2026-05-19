@@ -1,6 +1,12 @@
 import { authStorage } from "@/lib/auth";
 
-const DEFAULT_BASE_URL = "http://localhost:4000";
+const RAW_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!RAW_BASE_URL) {
+  throw new Error("NEXT_PUBLIC_API_URL is not defined");
+}
+
+const BASE_URL = RAW_BASE_URL.replace(/\/$/, "");
 
 export class ApiError extends Error {
   constructor(
@@ -11,11 +17,6 @@ export class ApiError extends Error {
     super(message);
     this.name = "ApiError";
   }
-}
-
-function getBaseUrl(): string {
-  const url = process.env.NEXT_PUBLIC_API_URL ?? DEFAULT_BASE_URL;
-  return url.replace(/\/$/, "");
 }
 
 function redirectToLogin(): void {
@@ -69,7 +70,7 @@ async function request<T>(method: string, path: string, body?: unknown, withAuth
     }
   }
 
-  const res = await fetch(`${getBaseUrl()}${path}`, {
+  const res = await fetch(`${BASE_URL}${path}`, {
     method,
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,

@@ -1,6 +1,9 @@
 "use client";
 
-import { formatEur, totalChargesMensuelles, totalRevenus } from "@/lib/calculs";
+import { useMemo } from "react";
+import { formatEur } from "@/lib/calculs";
+import { useRevenus } from "@/hooks/useRevenus";
+import { useCharges } from "@/hooks/useCharges";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { NavMobile } from "@/components/layout/NavMobile";
 
@@ -9,9 +12,21 @@ export interface HeaderProps {
 }
 
 export function Header({ foyerName = "Foyer Finance" }: HeaderProps) {
-  const revenus = totalRevenus();
-  const charges = totalChargesMensuelles();
-  const solde = revenus - charges;
+  const { revenus: revenusList, isLoading: loadingRevenus } = useRevenus();
+  const { chargesFoyer, isLoading: loadingCharges } = useCharges();
+
+  const totalRevenus = useMemo(
+    () => revenusList.filter((r) => r.actif).reduce((s, r) => s + (r.montantMensuel ?? 0), 0),
+    [revenusList],
+  );
+
+  const totalCharges = useMemo(
+    () => chargesFoyer.filter((c) => c.actif).reduce((s, c) => s + (c.montantMensuel ?? 0), 0),
+    [chargesFoyer],
+  );
+
+  const solde = totalRevenus - totalCharges;
+  const isLoading = loadingRevenus || loadingCharges;
 
   return (
     <header className="border-b border-slate-200 bg-slate-800 text-white">
@@ -29,15 +44,17 @@ export function Header({ foyerName = "Foyer Finance" }: HeaderProps) {
         <div className="flex items-center gap-4 sm:gap-6">
           <div className="hidden text-right text-sm sm:block">
             <p className="text-[10px] uppercase tracking-wide text-slate-400">Revenus</p>
-            <p className="font-bold text-emerald-400">{formatEur(revenus)}</p>
+            <p className="font-bold text-emerald-400">{isLoading ? "—" : formatEur(totalRevenus)}</p>
           </div>
           <div className="hidden text-right text-sm sm:block">
             <p className="text-[10px] uppercase tracking-wide text-slate-400">Charges</p>
-            <p className="font-bold text-rose-400">{formatEur(charges)}</p>
+            <p className="font-bold text-rose-400">{isLoading ? "—" : formatEur(totalCharges)}</p>
           </div>
           <div className="text-right text-sm">
             <p className="text-[10px] uppercase tracking-wide text-slate-400">Solde</p>
-            <p className={`font-bold ${solde >= 0 ? "text-indigo-300" : "text-rose-400"}`}>{formatEur(solde)}</p>
+            <p className={`font-bold ${solde >= 0 ? "text-indigo-300" : "text-rose-400"}`}>
+              {isLoading ? "—" : formatEur(solde)}
+            </p>
           </div>
           <UserMenu />
         </div>

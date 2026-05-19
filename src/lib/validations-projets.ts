@@ -26,5 +26,5 @@ export const projetAjoutSchemaAvecDateFuture = projetAjoutSchema.refine(
 export function defaultProjetAjoutValues(): ProjetAjoutValues {
   const d = new Date(AUJOURD_HUI.getFullYear(), AUJOURD_HUI.getMonth() + 2, 1);
   const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-  return { label: "", montant: 1000, date: ym, priorite: 3 };
+  return { label: "", montant: 0, date: ym, priorite: 3 };
 }

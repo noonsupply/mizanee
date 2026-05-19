@@ -199,7 +199,7 @@ export function ChargeFoyerForm({
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="verse-charge-fixe">Versé le (optionnel)</Label>
+            <Label htmlFor="verse-charge-fixe">Prélevé le (optionnel)</Label>
             <Input id="verse-charge-fixe" placeholder="Ex. 5 du mois" {...register("verseLeFixe")} />
           </div>
         </div>

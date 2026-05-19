@@ -19,7 +19,7 @@ export interface UseSyntheseOptions {
 }
 
 const DEFAULTS = {
-  epargneMensuelle: 300,
+  epargneMensuelle: 0,
   dateDebutEpargneAttendu: new Date(2026, 0, 1),
   dateRef: AUJOURD_HUI,
 } as const;

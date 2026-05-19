@@ -1,0 +1,320 @@
+.wrapper {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(226 232 240);
+  background: white;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
+}
+
+.headerRow {
+  display: none;
+  grid-template-columns: 24px 1fr 130px 120px 110px 90px 40px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgb(241 245 249);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgb(100 116 139);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 24px 1fr 130px 120px 110px 90px 40px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgb(241 245 249);
+}
+
+.rowDragging {
+  opacity: 0.45;
+}
+
+.dragHandle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: none;
+  background: transparent;
+  color: rgb(148 163 184);
+  cursor: grab;
+  border-radius: 4px;
+  touch-action: none;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.dragHandle:hover {
+  color: rgb(71 85 105);
+  background: rgb(241 245 249);
+}
+
+.projetNom {
+  min-width: 0;
+}
+
+.projetTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.labelBold {
+  font-weight: 600;
+  font-size: 14px;
+  color: rgb(15 23 42);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sousLabel {
+  margin-top: 2px;
+  font-size: 11px;
+  color: rgb(100 116 139);
+}
+
+.dateInput {
+  width: 100%;
+  max-width: 130px;
+  padding: 4px 8px;
+  font-size: 13px;
+  border: 1px solid rgb(226 232 240);
+  border-radius: 6px;
+  color: rgb(15 23 42);
+}
+
+.epargneMois {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.progressWrap {
+  min-width: 0;
+}
+
+.progressBar {
+  height: 4px;
+  border-radius: 2px;
+  background: rgb(241 245 249);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.2s ease;
+}
+
+.progressText {
+  margin-top: 4px;
+  font-size: 10px;
+  color: rgb(100 116 139);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  color: rgb(148 163 184);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.deleteBtn:hover {
+  color: rgb(225 75 74);
+  background: rgb(255 241 242);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr 100px 130px 90px auto;
+  gap: 12px;
+  align-items: end;
+  padding: 16px;
+  border-top: 1px solid rgb(226 232 240);
+  background: rgb(248 250 252 / 0.8);
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgb(100 116 139);
+}
+
+.formInput {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 13px;
+  border: 1px solid rgb(226 232 240);
+  border-radius: 6px;
+}
+
+.formError {
+  font-size: 11px;
+  color: rgb(225 75 74);
+}
+
+.addBtn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  background: #7f77dd;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.addBtn:hover {
+  background: #6b63c9;
+}
+
+.addBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.skeletonRow {
+  height: 56px;
+  margin: 8px 16px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgb(241 245 249) 25%, rgb(226 232 240) 50%, rgb(241 245 249) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Mobile card layout */
+.card {
+  display: none;
+}
+
+@media (min-width: 601px) {
+  .headerRow {
+    display: grid;
+  }
+
+  .row {
+    display: grid;
+  }
+
+  .card {
+    display: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .headerRow {
+    display: none;
+  }
+
+  .row {
+    display: none;
+  }
+
+  .card {
+    display: block;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgb(241 245 249);
+  }
+
+  .cardDragging {
+    opacity: 0.45;
+  }
+
+  .cardTop {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .cardMeta {
+    margin-top: 8px;
+    font-size: 11px;
+    color: rgb(100 116 139);
+  }
+
+  .cardRow2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+    align-items: center;
+  }
+
+  .cardRow2 label {
+    font-size: 11px;
+    color: rgb(100 116 139);
+    margin-right: 4px;
+  }
+
+  .cardProgress {
+    margin-top: 10px;
+  }
+
+  .cardBadge {
+    margin-top: 8px;
+  }
+
+  .form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .formSubmit {
+    grid-column: 1 / -1;
+  }
+
+  .addBtn {
+    width: 100%;
+  }
+}

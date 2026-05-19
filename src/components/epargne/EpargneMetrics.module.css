@@ -1,0 +1,60 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.card {
+  border-radius: 0.75rem;
+  border: 1px solid rgb(226 232 240);
+  background: white;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgb(100 116 139);
+}
+
+.value {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgb(15 23 42);
+}
+
+.hint {
+  margin-top: 4px;
+  font-size: 11px;
+  color: rgb(148 163 184);
+}
+
+.valueAvance {
+  color: rgb(4 120 87);
+}
+
+.valueRetard {
+  color: rgb(225 75 74);
+}
+
+.hintAvance {
+  color: rgb(4 120 87);
+}
+
+.hintRetard {
+  color: rgb(225 75 74);
+}
+
+.hintOk {
+  color: rgb(100 116 139);
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

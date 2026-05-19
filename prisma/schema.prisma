@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- NextAuth (Auth.js) + SPEC User ---
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+
+  foyerId String?
+  foyer   Foyer?  @relation(fields: [foyerId], references: [id], onDelete: SetNull)
+
+  membre Membre?
+
+  accounts    Account[]
+  sessions    Session[]
+  simulations SimulationScenario[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// --- Domaine métier (SPEC) ---
+
+model Foyer {
+  id        String   @id @default(cuid())
+  nom       String
+  emoji     String?
+  createdAt DateTime @default(now())
+
+  membres     Membre[]
+  charges     Charge[]
+  projets     Projet[]
+  users       User[]
+  simulations SimulationScenario[]
+
+  @@map("foyers")
+}
+
+model Membre {
+  id      String  @id @default(cuid())
+  prenom  String
+  couleur String  @default("#378ADD")
+  emoji   String?
+  actif   Boolean @default(true)
+  prorata Float   @default(0)
+
+  foyerId String
+  foyer   Foyer  @relation(fields: [foyerId], references: [id], onDelete: Cascade)
+
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  revenus Revenu[]
+  charges Charge[] @relation("ChargesMembre")
+  projets Projet[] @relation("ProjetsMembre")
+
+  createdAt DateTime @default(now())
+
+  @@map("membres")
+}
+
+model Revenu {
+  id       String     @id @default(cuid())
+  label    String
+  montant  Float
+  type     RevenuType
+  actif    Boolean    @default(true)
+  membreId String
+  membre   Membre     @relation(fields: [membreId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("revenus")
+}
+
+model Charge {
+  id        String          @id @default(cuid())
+  label     String
+  montant   Float
+  categorie ChargeCategorie
+  type      ChargeType      @default(COMMUNE)
+  actif     Boolean         @default(true)
+
+  membreId String?
+  membre   Membre? @relation("ChargesMembre", fields: [membreId], references: [id], onDelete: SetNull)
+
+  foyerId String
+  foyer   Foyer  @relation(fields: [foyerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("charges")
+}
+
+model Projet {
+  id               String       @id @default(cuid())
+  label            String
+  montant          Float
+  dateCible        DateTime
+  epargneMensuelle Float
+  priorite         Int          @default(1)
+  statut           ProjetStatut @default(EN_COURS)
+  couleur          String       @default("#378ADD")
+  emoji            String?
+
+  foyerId String
+  foyer   Foyer  @relation(fields: [foyerId], references: [id], onDelete: Cascade)
+
+  membres Membre[] @relation("ProjetsMembre")
+
+  createdAt DateTime @default(now())
+
+  @@map("projets")
+}
+
+model SimulationScenario {
+  id        String   @id @default(cuid())
+  label     String
+  payload   Json
+  createdAt DateTime @default(now())
+
+  foyerId String
+  foyer   Foyer  @relation(fields: [foyerId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("simulation_scenarios")
+}
+
+enum RevenuType {
+  SALAIRE
+  LOCATIF
+  FREELANCE
+  AUTRE
+}
+
+enum ChargeType {
+  COMMUNE
+  PERSONNELLE
+}
+
+enum ChargeCategorie {
+  LOGEMENT
+  ALIMENTATION
+  TRANSPORT
+  EDUCATION
+  LOISIRS
+  SANTE
+  ABONNEMENTS
+  AUTRE
+}
+
+enum ProjetStatut {
+  EN_COURS
+  ATTEINT
+  REPORTE
+  ABANDONNE
+}

@@ -1,16 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef } from "react";
 import { ChargeFoyerForm } from "@/components/charges/charge-foyer-form";
-import { ChargeListeFoyer } from "@/components/charges/charge-liste-foyer";
+import { ChargeList } from "@/components/charges/ChargeList";
 import { ChargesStackedChart } from "@/components/charges/charges-stacked-chart";
 import { Button } from "@/components/ui/button";
 import { useCharges } from "@/hooks/useCharges";
 import { useMembres } from "@/hooks/useMembres";
 import { membresToSelectorOptions } from "@/lib/membres-options";
-import type { ChargeFoyer } from "@/types/charges";
 
 export function ChargesModuleView() {
+  const formRef = useRef<HTMLDivElement>(null);
   const { membres, isLoading: loadingMembres } = useMembres();
   const {
     chargesFoyer,
@@ -22,7 +22,6 @@ export function ChargesModuleView() {
     updateCharge,
     removeCharge,
   } = useCharges();
-  const [editing, setEditing] = useState<ChargeFoyer | null>(null);
 
   const membresOpts = useMemo(() => membresToSelectorOptions(membres), [membres]);
 
@@ -58,29 +57,20 @@ export function ChargesModuleView() {
       </section>
 
       <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
-        <ChargeFoyerForm
-          key={editing?.id ?? "new"}
-          membres={membresOpts}
-          editingCharge={editing}
-          isSubmitting={isMutating}
-          onAdd={async (c) => {
-            if (editing) {
-              await updateCharge(editing.id, { ...c, id: editing.id });
-              setEditing(null);
-            } else {
-              await addCharge(c);
-            }
-          }}
-          onCancelEdit={editing ? () => setEditing(null) : undefined}
-        />
-        <ChargeListeFoyer
+        <div ref={formRef}>
+          <ChargeFoyerForm membres={membresOpts} isSubmitting={isMutating} onAdd={(c) => addCharge(c)} />
+        </div>
+        <ChargeList
           charges={chargesFoyer}
           membres={membresOpts}
           isMutating={isMutating}
-          onEdit={setEditing}
-          onRemove={(id) => {
-            if (window.confirm("Supprimer cette charge ?")) void removeCharge(id);
+          onUpdate={async (id, c) => {
+            await updateCharge(id, c);
           }}
+          onRemove={async (id) => {
+            await removeCharge(id);
+          }}
+          onAddCta={() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
         />
       </div>
     </div>

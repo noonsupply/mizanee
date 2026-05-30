@@ -53,6 +53,36 @@
   color: rgb(100 116 139);
 }
 
+.linkHint {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: rgb(127 119 221);
+  text-decoration: none;
+}
+
+.linkHint:hover {
+  text-decoration: underline;
+}
+
+.badgeRenseigner {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 6px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 9999px;
+  background: rgb(255 251 235);
+  color: rgb(146 64 14);
+  border: 1px solid rgb(253 230 138);
+  text-decoration: none;
+}
+
+.badgeRenseigner:hover {
+  background: rgb(254 243 199);
+}
+
 @media (max-width: 600px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);

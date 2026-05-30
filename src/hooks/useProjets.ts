@@ -7,6 +7,10 @@ import { isApiDebug, pickPayloadArray } from "@/lib/api-helpers";
 import { mapProjetApiToUi, mapProjetUiToApiInput } from "@/lib/api-mappers";
 import { runOptimisticMutation } from "@/lib/optimistic-mutation";
 import { useToast } from "@/components/ui/toast";
+import { useFoyer } from "@/hooks/useFoyer";
+import { resteAVivre } from "@/lib/calculs";
+import { allouerSolde, calculerPlanAction, enrichirProjet } from "@/lib/calculs-projets";
+import { EPARGNE_MENSUELLE } from "@/lib/epargne-constants";
 import type { ProjetApi, UpdateProjetInput } from "@/types/api";
 import type { Projet } from "@/types/projets";
 
@@ -18,6 +22,7 @@ function dateYmToIso(dateYm: string): string {
 export function useProjets() {
   const { showSuccess, showError } = useToast();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { foyer } = useFoyer();
   const [raw, setRaw] = useState<ProjetApi[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -51,6 +56,32 @@ export function useProjets() {
   }, [authLoading, isAuthenticated, refresh]);
 
   const projets = useMemo(() => raw.map(mapProjetApiToUi), [raw]);
+
+  const soldeDisponible = foyer?.soldeEpargne?.montant ?? 0;
+  const resteDisponible = useMemo(() => resteAVivre(EPARGNE_MENSUELLE), []);
+
+  const projetsCalcules = useMemo(
+    () => projets.map((p) => enrichirProjet(p, resteDisponible)),
+    [projets, resteDisponible],
+  );
+
+  const projetsAlloues = useMemo(
+    () => allouerSolde(projetsCalcules, soldeDisponible),
+    [projetsCalcules, soldeDisponible],
+  );
+
+  const planAction = useMemo(() => calculerPlanAction(projetsAlloues), [projetsAlloues]);
+
+  const stats = useMemo(
+    () => ({
+      soldeDisponible,
+      projetsFinances: projetsAlloues.filter((p) => p.statutAllocation === "finance").length,
+      projetUrgent: projetsAlloues.find((p) => p.urgence === "urgent"),
+      totalObjectifs: projets.reduce((acc, p) => acc + p.montant, 0),
+      epargneTotaleRequise: projetsAlloues.reduce((acc, p) => acc + p.epargneMensuelleRequise, 0),
+    }),
+    [projetsAlloues, projets, soldeDisponible],
+  );
 
   const addProjet = useCallback(
     async (projet: Projet) => {
@@ -187,6 +218,10 @@ export function useProjets() {
 
   return {
     projets,
+    projetsCalcules,
+    projetsAlloues,
+    planAction,
+    stats,
     raw,
     isLoading,
     error,

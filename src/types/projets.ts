@@ -29,6 +29,30 @@ export interface ProjetCalcule extends Projet {
   progressionPct: number;
 }
 
+export type StatutAllocation = "finance" | "partiel" | "non_finance";
+
+export type UrgenceProjet = "urgent" | "serre" | "ok" | "lointain";
+
+export interface ProjetAlloue extends ProjetCalcule {
+  /** Ce qui est alloué depuis le solde disponible */
+  montantAlloue: number;
+  /** montant - montantAlloue */
+  montantManquant: number;
+  /** montantAlloue / montant * 100 */
+  progressionReelle: number;
+  statutAllocation: StatutAllocation;
+  urgence: UrgenceProjet;
+  /** Épargne mensuelle pour combler le manque d'ici la date cible */
+  epargneMensuelleRequise: number;
+}
+
+export interface PlanActionLigne {
+  label: string;
+  montant: number;
+  couleur: string;
+  statut: StatutAllocation;
+}
+
 export interface PointSolde {
   mois: string;
   solde: number;

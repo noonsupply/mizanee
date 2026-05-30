@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { AllocationBanner } from "@/components/epargne/AllocationBanner";
 import { EpargneMetrics } from "@/components/epargne/EpargneMetrics";
+import { PlanActionCard } from "@/components/epargne/PlanActionCard";
 import { ProjetTable } from "@/components/epargne/ProjetTable";
 import { ProjetTimeline } from "@/components/epargne/ProjetTimeline";
 import { SoldeCumuleChart } from "@/components/epargne/SoldeCumuleChart";
@@ -9,8 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useFoyer } from "@/hooks/useFoyer";
 import { useProjets } from "@/hooks/useProjets";
 import { resteAVivre } from "@/lib/calculs";
-import { calculerEcartEpargne, calculerSoldeAttendu } from "@/lib/calculs-synthese";
-import { enrichirProjet, projeterSolde } from "@/lib/calculs-projets";
+import { allouerSolde, enrichirProjet, projeterSolde } from "@/lib/calculs-projets";
 import { EPARGNE_MENSUELLE } from "@/lib/epargne-constants";
 import { useDebouncedCallback } from "@/lib/use-debounced-callback";
 import type { Projet } from "@/types/projets";
@@ -42,36 +43,30 @@ export default function EpargnePage() {
 
   const resteDisponible = useMemo(() => resteAVivre(EPARGNE_MENSUELLE), []);
 
+  const soldeReel = foyer?.soldeEpargne?.montant ?? 0;
+
   const projetsCalcules = useMemo(
     () => projetsEffectifs.map((p) => enrichirProjet(p, resteDisponible)),
     [projetsEffectifs, resteDisponible],
   );
 
-  const soldeReel = foyer.soldeEpargne.montant;
-
-  const soldeAttendu = useMemo(
-    () => calculerSoldeAttendu(projetsEffectifs, EPARGNE_MENSUELLE),
-    [projetsEffectifs],
+  const projetsAlloues = useMemo(
+    () => allouerSolde(projetsCalcules, soldeReel),
+    [projetsCalcules, soldeReel],
   );
 
-  const { ecart: ecartEpargne, statut: statutEpargne } = useMemo(
-    () => calculerEcartEpargne(soldeReel, soldeAttendu),
-    [soldeReel, soldeAttendu],
+  const stats = useMemo(
+    () => ({
+      projetsFinances: projetsAlloues.filter((p) => p.statutAllocation === "finance").length,
+      projetUrgent: projetsAlloues.find((p) => p.urgence === "urgent"),
+      totalObjectifs: projetsEffectifs.reduce((s, p) => s + p.montant, 0),
+    }),
+    [projetsAlloues, projetsEffectifs],
   );
 
   const pointsSolde = useMemo(
     () => projeterSolde(projetsEffectifs, soldeReel, EPARGNE_MENSUELLE, 24),
     [projetsEffectifs, soldeReel],
-  );
-
-  const projetsActifs = useMemo(
-    () => projetsEffectifs.filter((p) => p.statut === "en_cours").length,
-    [projetsEffectifs],
-  );
-
-  const totalObjectifs = useMemo(
-    () => projetsEffectifs.filter((p) => p.statut === "en_cours").reduce((s, p) => s + p.montant, 0),
-    [projetsEffectifs],
   );
 
   const debouncedDatePatch = useDebouncedCallback((id: string, dateYm: string) => {
@@ -131,17 +126,27 @@ export default function EpargnePage() {
   return (
     <div className={styles.page}>
       <EpargneMetrics
-        epargneMensuelle={EPARGNE_MENSUELLE}
-        projetsActifs={projetsActifs}
-        soldeReel={soldeReel}
-        soldeAttendu={soldeAttendu}
-        ecartEpargne={ecartEpargne}
-        statutEpargne={statutEpargne}
-        totalObjectifs={totalObjectifs}
+        soldeDisponible={soldeReel}
+        projetsFinances={stats.projetsFinances}
+        totalProjets={projetsAlloues.length}
+        projetUrgent={stats.projetUrgent}
+        totalObjectifs={stats.totalObjectifs}
       />
 
+      {soldeReel > 0 ? (
+        <AllocationBanner projetsAlloues={projetsAlloues} soldeDisponible={soldeReel} />
+      ) : (
+        <div className={styles.alertBanner}>
+          Renseignez votre solde épargne depuis la{" "}
+          <a href="/dashboard" className={styles.alertLink}>
+            synthèse
+          </a>{" "}
+          pour activer l&apos;allocation intelligente.
+        </div>
+      )}
+
       <ProjetTable
-        projets={projetsCalcules}
+        projets={projetsAlloues}
         isLoading={isLoading}
         onDateChange={onDateChange}
         onRemove={onRemove}
@@ -150,9 +155,11 @@ export default function EpargnePage() {
       />
 
       <div className={styles.bottomGrid}>
-        <ProjetTimeline projets={projetsCalcules} />
+        <ProjetTimeline projets={projetsAlloues} />
         <SoldeCumuleChart points={pointsSolde} />
       </div>
+
+      <PlanActionCard projetsAlloues={projetsAlloues} />
     </div>
   );
 }

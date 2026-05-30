@@ -1,0 +1,120 @@
+.banner {
+  border-radius: 0.75rem;
+  border: 1px solid rgb(226 232 240);
+  background: white;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgb(15 23 42);
+}
+
+.subtitle {
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgb(100 116 139);
+}
+
+.list {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.line {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lineTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dotMuted {
+  background: rgb(203 213 225);
+}
+
+.lineLabel {
+  font-weight: 600;
+  color: rgb(30 41 59);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lineValue {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: rgb(51 65 85);
+  white-space: nowrap;
+}
+
+.check {
+  color: rgb(29 158 117);
+  font-weight: 700;
+}
+
+.muted {
+  color: rgb(148 163 184);
+}
+
+.bar {
+  height: 3px;
+  border-radius: 2px;
+  background: rgb(241 245 249);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.2s ease;
+}
+
+.barFinance {
+  background: #1d9e75;
+}
+
+.barPartiel {
+  background: #ef9f27;
+}
+
+.barVide {
+  background: rgb(203 213 225);
+}
+
+.footer {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgb(241 245 249);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.footerLabel {
+  color: rgb(100 116 139);
+}
+
+.footerValue {
+  font-weight: 700;
+  color: rgb(15 23 42);
+  font-variant-numeric: tabular-nums;
+}

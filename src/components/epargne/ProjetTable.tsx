@@ -20,7 +20,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { GripVertical, Trash2 } from "lucide-react";
+import { CalendarDays, Clock, Flame, GripVertical, Trash2 } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useMembres } from "@/hooks/useMembres";
 import { formatEur } from "@/lib/calculs";
@@ -29,7 +29,7 @@ import {
   projetAjoutSchemaAvecDateFuture,
   type ProjetAjoutValues,
 } from "@/lib/validations-projets";
-import type { Projet, ProjetCalcule, StatutProjet } from "@/types/projets";
+import type { Projet, ProjetAlloue, StatutAllocation, StatutProjet, UrgenceProjet } from "@/types/projets";
 import styles from "./ProjetTable.module.css";
 
 const COULEURS_DEFAUT = ["#7F77DD", "#1D9E75", "#D85A30", "#378ADD", "#D4537E", "#EF9F27", "#5DCAA5"] as const;
@@ -49,7 +49,7 @@ function couleurPourSeed(seed: string): string {
   return COULEURS_DEFAUT[h % COULEURS_DEFAUT.length] ?? "#7F77DD";
 }
 
-function stripCalcule(p: ProjetCalcule): Projet {
+function stripCalcule(p: ProjetAlloue): Projet {
   return {
     id: p.id,
     label: p.label,
@@ -63,42 +63,58 @@ function stripCalcule(p: ProjetCalcule): Projet {
   };
 }
 
-function faisabiliteClass(f: ProjetCalcule["faisabilite"]): string {
-  if (f === "faisable") return "bg-emerald-50 text-emerald-800 border-emerald-200";
-  if (f === "serre") return "bg-amber-50 text-amber-900 border-amber-200";
+const ALLOCATION_COLOR: Record<StatutAllocation, string> = {
+  finance: "#1D9E75",
+  partiel: "#EF9F27",
+  non_finance: "#E24B4A",
+};
+
+function statutClass(s: StatutAllocation): string {
+  if (s === "finance") return "bg-emerald-50 text-emerald-800 border-emerald-200";
+  if (s === "partiel") return "bg-amber-50 text-amber-900 border-amber-200";
   return "bg-rose-50 text-rose-800 border-rose-200";
 }
 
-function faisabiliteLabel(f: ProjetCalcule["faisabilite"]): string {
-  if (f === "faisable") return "Faisable";
-  if (f === "serre") return "Serré";
-  return "Difficile";
+function statutLabel(s: StatutAllocation): string {
+  if (s === "finance") return "Financé";
+  if (s === "partiel") return "Partiel";
+  return "Non financé";
 }
 
-function epargneColorClass(f: ProjetCalcule["faisabilite"]): string {
-  if (f === "faisable") return "text-emerald-700";
-  if (f === "serre") return "text-amber-700";
-  return "text-rose-700";
+function urgenceClass(u: UrgenceProjet): string {
+  if (u === "urgent") return "bg-rose-50 text-rose-800 border-rose-200";
+  if (u === "serre") return "bg-amber-50 text-amber-900 border-amber-200";
+  if (u === "ok") return "bg-emerald-50 text-emerald-800 border-emerald-200";
+  return "bg-slate-50 text-slate-600 border-slate-200";
 }
 
-function formatEpargneMois(ep: number): string {
-  if (!Number.isFinite(ep) || ep <= 0) return "—";
-  return `${formatEur(ep)}/m`;
+function urgenceLabel(u: UrgenceProjet, moisRestants: number): string {
+  const enX = `dans ${moisRestants} mois`;
+  if (u === "urgent") return `Urgent — ${enX}`;
+  if (u === "serre") return `Serré — ${enX}`;
+  if (u === "ok") return `OK — ${enX}`;
+  return "Lointain";
+}
+
+function UrgenceIcon({ urgence }: { urgence: UrgenceProjet }) {
+  if (urgence === "urgent") return <Flame className="h-3 w-3" aria-hidden />;
+  if (urgence === "serre") return <Clock className="h-3 w-3" aria-hidden />;
+  if (urgence === "ok") return <CalendarDays className="h-3 w-3" aria-hidden />;
+  return null;
 }
 
 interface SortableRowProps {
-  projet: ProjetCalcule;
+  projet: ProjetAlloue;
   membreLabel: string;
   onDateChange: (id: string, dateYm: string) => void;
-  onRemoveRequest: (projet: ProjetCalcule) => void;
+  onRemoveRequest: (projet: ProjetAlloue) => void;
 }
 
 function SortableProjetRow({ projet, membreLabel, onDateChange, onRemoveRequest }: SortableRowProps) {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
     id: projet.id,
   });
-  const deja = projet.montantDeja ?? 0;
-  const ep = projet.epargneMensuelleNecessaire;
+  const allocColor = ALLOCATION_COLOR[projet.statutAllocation];
   const dragStyle = { transform: CSS.Transform.toString(transform), transition };
   const draggingClass = isDragging ? styles.rowDragging : "";
 
@@ -136,22 +152,23 @@ function SortableProjetRow({ projet, membreLabel, onDateChange, onRemoveRequest 
           onChange={(e) => onDateChange(projet.id, e.target.value)}
           aria-label={`Date cible pour ${projet.label}`}
         />
-        <span className={`${styles.epargneMois} ${epargneColorClass(projet.faisabilite)}`}>
-          {formatEpargneMois(ep)}
+        <span className={`${styles.badge} ${urgenceClass(projet.urgence)}`}>
+          <UrgenceIcon urgence={projet.urgence} />
+          {urgenceLabel(projet.urgence, projet.moisRestants)}
         </span>
         <div className={styles.progressWrap}>
           <div className={styles.progressBar}>
             <div
               className={styles.progressFill}
-              style={{ width: `${projet.progressionPct}%`, backgroundColor: projet.color }}
+              style={{ width: `${Math.min(100, projet.progressionReelle)}%`, backgroundColor: allocColor }}
             />
           </div>
           <p className={styles.progressText}>
-            {formatEur(Math.min(deja, projet.montant))} / {formatEur(projet.montant)}
+            {formatEur(projet.montantAlloue)} alloués / {formatEur(projet.montant)}
           </p>
         </div>
-        <span className={`${styles.badge} ${faisabiliteClass(projet.faisabilite)}`}>
-          {faisabiliteLabel(projet.faisabilite)}
+        <span className={`${styles.badge} ${statutClass(projet.statutAllocation)}`}>
+          {statutLabel(projet.statutAllocation)}
         </span>
         <button
           type="button"
@@ -192,25 +209,17 @@ function SortableProjetRow({ projet, membreLabel, onDateChange, onRemoveRequest 
               onChange={(e) => onDateChange(projet.id, e.target.value)}
             />
           </span>
-          <span className={`${styles.epargneMois} ${epargneColorClass(projet.faisabilite)}`}>
-            Épargne: {formatEpargneMois(ep)}
-          </span>
         </div>
         <div className={styles.cardProgress}>
           <div className={styles.progressBar}>
             <div
               className={styles.progressFill}
-              style={{ width: `${projet.progressionPct}%`, backgroundColor: projet.color }}
+              style={{ width: `${Math.min(100, projet.progressionReelle)}%`, backgroundColor: allocColor }}
             />
           </div>
           <p className={styles.progressText}>
-            {formatEur(Math.min(deja, projet.montant))} / {formatEur(projet.montant)}
+            {formatEur(projet.montantAlloue)} / {formatEur(projet.montant)}
           </p>
-        </div>
-        <div className={styles.cardBadge}>
-          <span className={`${styles.badge} ${faisabiliteClass(projet.faisabilite)}`}>
-            {faisabiliteLabel(projet.faisabilite)}
-          </span>
         </div>
       </div>
     </div>
@@ -218,7 +227,7 @@ function SortableProjetRow({ projet, membreLabel, onDateChange, onRemoveRequest 
 }
 
 export interface ProjetTableProps {
-  projets: ProjetCalcule[];
+  projets: ProjetAlloue[];
   onDateChange: (id: string, dateYm: string) => void;
   onRemove: (id: string) => void;
   onReorder: (projets: Projet[]) => void;
@@ -235,7 +244,7 @@ export function ProjetTable({
   isLoading = false,
 }: ProjetTableProps) {
   const { membres } = useMembres();
-  const [deleteTarget, setDeleteTarget] = useState<ProjetCalcule | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ProjetAlloue | null>(null);
 
   const membreParId = useMemo(() => {
     const m = new Map<string, string>();
@@ -302,16 +311,16 @@ export function ProjetTable({
 
   const onSubmitAdd = handleSubmit(submitAdd);
 
-  const membreLabel = (p: ProjetCalcule) => (p.membreId ? (membreParId.get(p.membreId) ?? "") : "Commun");
+  const membreLabel = (p: ProjetAlloue) => (p.membreId ? (membreParId.get(p.membreId) ?? "") : "Commun");
 
   return (
     <section className={styles.wrapper} aria-label="Projets d'épargne">
       <div className={styles.headerRow}>
         <span aria-hidden />
         <span>Projet</span>
-        <span>Date cible</span>
-        <span>Épargne/mois</span>
-        <span>Progression</span>
+        <span>Échéance</span>
+        <span>Urgence</span>
+        <span>Progression réelle</span>
         <span>Statut</span>
         <span aria-hidden />
       </div>

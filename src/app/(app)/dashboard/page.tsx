@@ -38,8 +38,25 @@ function scrollToSoldeEpargneAndEdit(ref: RefObject<SoldeEpargneWidgetHandle | n
 
 export default function DashboardPage() {
   const soldeEpargneRef = useRef<SoldeEpargneWidgetHandle>(null);
-  const { synthese, foyer, soldeEpargneUpdatedAt, updateSoldeEpargne, isLoading, error, refresh } = useSynthese();
+  const {
+    synthese,
+    foyer,
+    soldeEpargneUpdatedAt,
+    updateSoldeEpargne,
+    applySoldeEpargne,
+    terminerProjet,
+    isLoading,
+    error,
+    refresh,
+  } = useSynthese();
   const { membres } = useMembres();
+
+  const onTerminerProjet = async (id: string) => {
+    const nouveauSolde = await terminerProjet(id);
+    if (typeof nouveauSolde === "number") {
+      applySoldeEpargne(nouveauSolde);
+    }
+  };
 
   const { dateLabel } = useDate();
 
@@ -116,7 +133,7 @@ export default function DashboardPage() {
         />
       </div>
 
-      <EcheancesWidget echeances={synthese.echeances} />
+      <EcheancesWidget echeances={synthese.echeances} onTerminerProjet={onTerminerProjet} />
       <ProjectionChart projection={synthese.projection} />
     </div>
   );

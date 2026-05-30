@@ -28,12 +28,18 @@ export function useSynthese(options: UseSyntheseOptions = {}) {
     error: errorFoyer,
     refresh: refreshFoyer,
     updateSoldeEpargne,
+    applySoldeEpargne,
   } = useFoyer();
   const { revenus, isLoading: loadingRevenus, error: errorRevenus, refresh: refreshRevenus } = useRevenus();
   const { charges: chargesRaw, isLoading: loadingCharges, error: errorCharges, refresh: refreshCharges } =
     useCharges();
-  const { projets: projetsUi, isLoading: loadingProjets, error: errorProjets, refresh: refreshProjets } =
-    useProjets();
+  const {
+    projets: projetsUi,
+    isLoading: loadingProjets,
+    error: errorProjets,
+    refresh: refreshProjets,
+    terminerProjet,
+  } = useProjets();
   const { membres, isLoading: loadingMembres, error: errorMembres, refresh: refreshMembres } = useMembres();
 
   const epargneMensuelle = options.epargneMensuelle ?? DEFAULTS.epargneMensuelle;
@@ -50,6 +56,11 @@ export function useSynthese(options: UseSyntheseOptions = {}) {
     }
     const slotMap = buildMembreSlotMap(membres);
     const charges = chargesRaw.map((c) => mapChargeApiToFoyer(c, slotMap));
+    // Les revenus arrivent avec l'identifiant membre réel : on les ramène sur les
+    // slots `p1` / `p2` (comme les charges) pour que le calcul du prorata fonctionne.
+    const revenusSlot = revenus.map((r) =>
+      r.membreId ? { ...r, membreId: slotMap.get(r.membreId) ?? r.membreId } : r,
+    );
     const projets = projetsUi;
     const membresSynth = membres
       .filter((m) => m.actif)
@@ -66,7 +77,7 @@ export function useSynthese(options: UseSyntheseOptions = {}) {
 
     return construireDonneesSynthese({
       dateRef,
-      revenus,
+      revenus: revenusSlot,
       charges,
       projets,
       membres: membresSynth,
@@ -104,6 +115,8 @@ export function useSynthese(options: UseSyntheseOptions = {}) {
     foyer: foyerSafe,
     soldeEpargneUpdatedAt,
     updateSoldeEpargne,
+    applySoldeEpargne,
+    terminerProjet,
     isLoading,
     error,
     refresh,

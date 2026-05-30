@@ -9,7 +9,7 @@
 
 .headerRow {
   display: none;
-  grid-template-columns: 24px 1fr 130px 160px 150px 110px 40px;
+  grid-template-columns: 24px 1fr 130px 150px 130px 90px 108px;
   gap: 12px;
   align-items: center;
   padding: 10px 16px;
@@ -28,7 +28,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: 24px 1fr 130px 160px 150px 110px 40px;
+  grid-template-columns: 24px 1fr 130px 150px 130px 90px 108px;
   gap: 12px;
   align-items: center;
   padding: 12px 16px;
@@ -144,7 +144,22 @@
   white-space: nowrap;
 }
 
-.deleteBtn {
+.statutCell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.actionsGroup {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  justify-content: flex-end;
+}
+
+.actionBtn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,11 +169,121 @@
   color: rgb(148 163 184);
   border-radius: 6px;
   cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
-.deleteBtn:hover {
+.actionBtn:hover {
+  color: rgb(71 85 105);
+  background: rgb(241 245 249);
+}
+
+.actionBtnSolder:hover {
+  color: #178a65;
+  background: #eaf6f0;
+}
+
+.actionBtnDanger:hover {
   color: rgb(225 75 74);
   background: rgb(255 241 242);
+}
+
+.soldeConfirmBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #eaf6f0;
+  border-bottom: 1px solid rgb(241 245 249);
+}
+
+.soldeConfirmText {
+  font-size: 13px;
+  color: rgb(15 23 42);
+}
+
+.soldeConfirmBtns {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.soldeConfirmYes {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  background: #1d9e75;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.soldeConfirmYes:hover {
+  background: #178a65;
+}
+
+.soldeConfirmNo {
+  padding: 4px 12px;
+  font-size: 12px;
+  color: rgb(100 116 139);
+  background: white;
+  border: 1px solid rgb(226 232 240);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.editPanel {
+  display: grid;
+  grid-template-columns: 1fr 100px 130px 90px;
+  gap: 12px;
+  align-items: end;
+  padding: 12px 16px;
+  background: rgb(248 250 252 / 0.8);
+  border-bottom: 1px solid rgb(241 245 249);
+}
+
+.editField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.editActions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}
+
+.editSave {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  background: #7f77dd;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.editSave:hover {
+  background: #6b63c9;
+}
+
+.editSave:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.editCancel {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: rgb(100 116 139);
+  background: white;
+  border: 1px solid rgb(226 232 240);
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .form {
@@ -306,6 +431,29 @@
 
   .cardBadge {
     margin-top: 8px;
+  }
+
+  .soldeConfirmBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .soldeConfirmBtns {
+    width: 100%;
+  }
+
+  .soldeConfirmYes,
+  .soldeConfirmNo {
+    flex: 1;
+  }
+
+  .editPanel {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .editActions .editSave,
+  .editActions .editCancel {
+    flex: 1;
   }
 
   .form {

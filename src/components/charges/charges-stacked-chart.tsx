@@ -12,9 +12,11 @@ import {
   type ChartData,
   type TooltipItem,
 } from "chart.js";
+import type { MembreRevenu } from "@/data/membres";
 import { formatEur } from "@/lib/calculs";
 import { MOIS_CLES } from "@/lib/calculs-revenus";
-import { couleurSegmentCharge, montantChargePourMois } from "@/lib/calculs-charges";
+import { montantChargePourMois } from "@/lib/calculs-charges";
+import { COMMUN_MEMBRE, isCommunMembreId } from "@/lib/commun-membre";
 import type { ChargeFoyer } from "@/types/charges";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
@@ -29,36 +31,53 @@ function moisLabelsCourants(): string[] {
 
 export interface ChargesStackedChartProps {
   charges: ChargeFoyer[];
+  membres: MembreRevenu[];
   title?: string;
 }
 
-export function ChargesStackedChart({ charges, title = "Impact mensuel des charges (12 mois)" }: ChargesStackedChartProps) {
+export function ChargesStackedChart({
+  charges,
+  membres,
+  title = "Impact mensuel des charges (12 mois)",
+}: ChargesStackedChartProps) {
   const actives = useMemo(() => charges.filter((c) => c.actif), [charges]);
+
+  const segments = useMemo(
+    () => [
+      { key: COMMUN_MEMBRE.id, label: COMMUN_MEMBRE.label, couleur: COMMUN_MEMBRE.couleur, commun: true },
+      ...membres.map((m) => ({ key: m.id, label: m.prenom, couleur: m.couleur, commun: false })),
+    ],
+    [membres],
+  );
 
   const data: ChartData<"bar"> = useMemo(() => {
     const labels = moisLabelsCourants();
-    const datasets = actives.map((ch) => ({
-      label: ch.label,
-      data: MOIS_CLES.map((m) => montantChargePourMois(ch, m)),
-      backgroundColor: couleurSegmentCharge(ch),
-      borderWidth: 0,
-      borderRadius: 2,
-      stack: "charges",
-    }));
+    const datasets = segments.map((seg) => {
+      const chargesSeg = actives.filter((c) =>
+        seg.commun ? isCommunMembreId(c.membreId) : c.membreId === seg.key,
+      );
+      return {
+        label: seg.label,
+        data: MOIS_CLES.map((m) => chargesSeg.reduce((acc, c) => acc + montantChargePourMois(c, m), 0)),
+        backgroundColor: seg.couleur,
+        borderWidth: 0,
+        borderRadius: 2,
+        stack: "charges",
+      };
+    });
 
     return {
       labels,
       datasets,
     };
-  }, [actives]);
+  }, [actives, segments]);
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "bottom" as const,
-        labels: { boxWidth: 10, font: { size: 10 }, padding: 8 },
+        display: false,
       },
       title: {
         display: true,
@@ -99,7 +118,7 @@ export function ChargesStackedChart({ charges, title = "Impact mensuel des charg
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="h-72 w-full min-h-[18rem] sm:h-80">
+      <div className="h-50 w-full sm:h-70">
         {actives.length === 0 ? (
           <p className="flex h-full items-center justify-center text-sm text-slate-500">
             Ajoutez des charges pour voir le graphique empilé.
@@ -108,6 +127,20 @@ export function ChargesStackedChart({ charges, title = "Impact mensuel des charg
           <Bar data={data} options={options} />
         )}
       </div>
+      {actives.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-3">
+          {segments.map((seg) => (
+            <span key={seg.key} className="flex items-center gap-1.5 text-xs">
+              <span
+                className="inline-block h-2.5 w-2.5 rounded-sm"
+                style={{ backgroundColor: seg.couleur }}
+                aria-hidden
+              />
+              <span className="text-slate-500">{seg.label}</span>
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

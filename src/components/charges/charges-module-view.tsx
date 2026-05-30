@@ -53,7 +53,7 @@ export function ChargesModuleView() {
         <h2 id="charges-chart-title" className="sr-only">
           Graphique des charges par mois
         </h2>
-        <ChargesStackedChart charges={chargesFoyer} />
+        <ChargesStackedChart charges={chargesFoyer} membres={membresOpts} />
       </section>
 
       <div className="grid gap-8 lg:grid-cols-2 lg:items-start">

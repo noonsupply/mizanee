@@ -20,6 +20,8 @@ export interface Projet {
   montantDeja?: number;
   /** Épargne mensuelle calculée côté API */
   epargneMensuelle?: number;
+  /** Mois de la dépense effective (`YYYY-MM`) une fois le projet terminé */
+  dateDepense?: string | null;
 }
 
 export interface ProjetCalcule extends Projet {

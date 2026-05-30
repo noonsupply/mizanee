@@ -20,7 +20,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarDays, Clock, Flame, GripVertical, Trash2 } from "lucide-react";
+import { BadgeCheck, CalendarDays, Clock, Flame, GripVertical, Pencil, Trash2 } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useMembres } from "@/hooks/useMembres";
 import { formatEur } from "@/lib/calculs";
@@ -103,14 +103,170 @@ function UrgenceIcon({ urgence }: { urgence: UrgenceProjet }) {
   return null;
 }
 
-interface SortableRowProps {
+function estEligibleTerminer(p: ProjetAlloue): boolean {
+  return p.statut === "en_cours";
+}
+
+interface ActionsGroupProps {
   projet: ProjetAlloue;
-  membreLabel: string;
-  onDateChange: (id: string, dateYm: string) => void;
+  onAskEdit: (id: string) => void;
+  onAskSolder: (id: string) => void;
   onRemoveRequest: (projet: ProjetAlloue) => void;
 }
 
-function SortableProjetRow({ projet, membreLabel, onDateChange, onRemoveRequest }: SortableRowProps) {
+function ActionsGroup({ projet, onAskEdit, onAskSolder, onRemoveRequest }: ActionsGroupProps) {
+  return (
+    <div className={styles.actionsGroup}>
+      <button
+        type="button"
+        className={styles.actionBtn}
+        onClick={() => onAskEdit(projet.id)}
+        aria-label={`Modifier ${projet.label}`}
+        title="Modifier"
+      >
+        <Pencil className="h-4 w-4" aria-hidden />
+      </button>
+      {estEligibleTerminer(projet) ? (
+        <button
+          type="button"
+          className={`${styles.actionBtn} ${styles.actionBtnSolder}`}
+          onClick={() => onAskSolder(projet.id)}
+          aria-label={`Solder le projet ${projet.label}`}
+          title="Solder le projet"
+        >
+          <BadgeCheck className="h-4 w-4" aria-hidden />
+        </button>
+      ) : null}
+      <button
+        type="button"
+        className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
+        onClick={() => onRemoveRequest(projet)}
+        aria-label={`Supprimer ${projet.label}`}
+        title="Supprimer"
+      >
+        <Trash2 className="h-4 w-4" aria-hidden />
+      </button>
+    </div>
+  );
+}
+
+interface ProjetEditFormProps {
+  projet: ProjetAlloue;
+  onSave: (id: string, patch: { label: string; montant: number; date: string; priorite: number }) => void;
+  onCancel: () => void;
+}
+
+function ProjetEditForm({ projet, onSave, onCancel }: ProjetEditFormProps) {
+  const [label, setLabel] = useState(projet.label);
+  const [montant, setMontant] = useState(String(projet.montant));
+  const [date, setDate] = useState(projet.date);
+  const [priorite, setPriorite] = useState(projet.priorite);
+
+  const montantNum = Number(montant);
+  const valide = label.trim().length > 0 && Number.isFinite(montantNum) && montantNum > 0 && date.length >= 7;
+
+  const submit = () => {
+    if (!valide) return;
+    onSave(projet.id, { label: label.trim(), montant: montantNum, date, priorite });
+  };
+
+  return (
+    <div className={styles.editPanel}>
+      <div className={styles.editField}>
+        <label className={styles.formLabel} htmlFor={`edit-label-${projet.id}`}>
+          Nom
+        </label>
+        <input
+          id={`edit-label-${projet.id}`}
+          className={styles.formInput}
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+        />
+      </div>
+      <div className={styles.editField}>
+        <label className={styles.formLabel} htmlFor={`edit-montant-${projet.id}`}>
+          Montant €
+        </label>
+        <input
+          id={`edit-montant-${projet.id}`}
+          type="number"
+          min={1}
+          step={1}
+          className={styles.formInput}
+          value={montant}
+          onChange={(e) => setMontant(e.target.value)}
+        />
+      </div>
+      <div className={styles.editField}>
+        <label className={styles.formLabel} htmlFor={`edit-date-${projet.id}`}>
+          Date cible
+        </label>
+        <input
+          id={`edit-date-${projet.id}`}
+          type="month"
+          className={styles.formInput}
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
+      </div>
+      <div className={styles.editField}>
+        <label className={styles.formLabel} htmlFor={`edit-prio-${projet.id}`}>
+          Priorité
+        </label>
+        <select
+          id={`edit-prio-${projet.id}`}
+          className={styles.formInput}
+          value={priorite}
+          onChange={(e) => setPriorite(Number(e.target.value))}
+        >
+          {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+            <option key={n} value={n}>
+              P{n}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className={styles.editActions}>
+        <button type="button" className={styles.editSave} onClick={submit} disabled={!valide}>
+          Enregistrer
+        </button>
+        <button type="button" className={styles.editCancel} onClick={onCancel}>
+          Annuler
+        </button>
+      </div>
+    </div>
+  );
+}
+
+interface SortableRowProps {
+  projet: ProjetAlloue;
+  membreLabel: string;
+  soldeConfirmActif: boolean;
+  editActif: boolean;
+  onDateChange: (id: string, dateYm: string) => void;
+  onRemoveRequest: (projet: ProjetAlloue) => void;
+  onAskEdit: (id: string) => void;
+  onCancelEdit: () => void;
+  onSaveEdit: (id: string, patch: { label: string; montant: number; date: string; priorite: number }) => void;
+  onAskSolder: (id: string) => void;
+  onCancelSolder: () => void;
+  onConfirmSolder: (id: string) => void;
+}
+
+function SortableProjetRow({
+  projet,
+  membreLabel,
+  soldeConfirmActif,
+  editActif,
+  onDateChange,
+  onRemoveRequest,
+  onAskEdit,
+  onCancelEdit,
+  onSaveEdit,
+  onAskSolder,
+  onCancelSolder,
+  onConfirmSolder,
+}: SortableRowProps) {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
     id: projet.id,
   });
@@ -167,17 +323,17 @@ function SortableProjetRow({ projet, membreLabel, onDateChange, onRemoveRequest 
             {formatEur(projet.montantAlloue)} alloués / {formatEur(projet.montant)}
           </p>
         </div>
-        <span className={`${styles.badge} ${statutClass(projet.statutAllocation)}`}>
-          {statutLabel(projet.statutAllocation)}
-        </span>
-        <button
-          type="button"
-          className={styles.deleteBtn}
-          onClick={() => onRemoveRequest(projet)}
-          aria-label={`Supprimer ${projet.label}`}
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
+        <div className={styles.statutCell}>
+          <span className={`${styles.badge} ${statutClass(projet.statutAllocation)}`}>
+            {statutLabel(projet.statutAllocation)}
+          </span>
+        </div>
+        <ActionsGroup
+          projet={projet}
+          onAskEdit={onAskEdit}
+          onAskSolder={onAskSolder}
+          onRemoveRequest={onRemoveRequest}
+        />
       </div>
 
       <div className={`${styles.card} ${isDragging ? styles.cardDragging : ""}`}>
@@ -185,14 +341,12 @@ function SortableProjetRow({ projet, membreLabel, onDateChange, onRemoveRequest 
           {gripBtn(false)}
           <span className={styles.dot} style={{ backgroundColor: projet.color }} aria-hidden />
           <span className={`${styles.labelBold} flex-1`}>{projet.label}</span>
-          <button
-            type="button"
-            className={styles.deleteBtn}
-            onClick={() => onRemoveRequest(projet)}
-            aria-label={`Supprimer ${projet.label}`}
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
+          <ActionsGroup
+            projet={projet}
+            onAskEdit={onAskEdit}
+            onAskSolder={onAskSolder}
+            onRemoveRequest={onRemoveRequest}
+          />
         </div>
         <p className={styles.cardMeta}>
           {formatEur(projet.montant)} · P{projet.priorite}
@@ -222,6 +376,24 @@ function SortableProjetRow({ projet, membreLabel, onDateChange, onRemoveRequest 
           </p>
         </div>
       </div>
+
+      {soldeConfirmActif ? (
+        <div className={styles.soldeConfirmBar} role="group" aria-label="Confirmer le solde du projet">
+          <span className={styles.soldeConfirmText}>
+            Solder « {projet.label} » et déduire {formatEur(projet.montant)} du solde épargne ?
+          </span>
+          <div className={styles.soldeConfirmBtns}>
+            <button type="button" className={styles.soldeConfirmYes} onClick={() => onConfirmSolder(projet.id)}>
+              Confirmer
+            </button>
+            <button type="button" className={styles.soldeConfirmNo} onClick={onCancelSolder}>
+              Annuler
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {editActif ? <ProjetEditForm projet={projet} onSave={onSaveEdit} onCancel={onCancelEdit} /> : null}
     </div>
   );
 }
@@ -232,6 +404,8 @@ export interface ProjetTableProps {
   onRemove: (id: string) => void;
   onReorder: (projets: Projet[]) => void;
   onAdd: (projet: Projet) => void | Promise<unknown>;
+  onTerminer: (id: string) => void;
+  onUpdate: (id: string, patch: Partial<Projet> & { date?: string }) => void;
   isLoading?: boolean;
 }
 
@@ -241,10 +415,14 @@ export function ProjetTable({
   onRemove,
   onReorder,
   onAdd,
+  onTerminer,
+  onUpdate,
   isLoading = false,
 }: ProjetTableProps) {
   const { membres } = useMembres();
   const [deleteTarget, setDeleteTarget] = useState<ProjetAlloue | null>(null);
+  const [confirmTerminerId, setConfirmTerminerId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
 
   const membreParId = useMemo(() => {
     const m = new Map<string, string>();
@@ -336,8 +514,28 @@ export function ProjetTable({
                   key={p.id}
                   projet={p}
                   membreLabel={membreLabel(p)}
+                  soldeConfirmActif={confirmTerminerId === p.id}
+                  editActif={editId === p.id}
                   onDateChange={onDateChange}
                   onRemoveRequest={setDeleteTarget}
+                  onAskEdit={(id) => {
+                    setConfirmTerminerId(null);
+                    setEditId(id);
+                  }}
+                  onCancelEdit={() => setEditId(null)}
+                  onSaveEdit={(id, patch) => {
+                    onUpdate(id, patch);
+                    setEditId(null);
+                  }}
+                  onAskSolder={(id) => {
+                    setEditId(null);
+                    setConfirmTerminerId(id);
+                  }}
+                  onCancelSolder={() => setConfirmTerminerId(null)}
+                  onConfirmSolder={(id) => {
+                    onTerminer(id);
+                    setConfirmTerminerId(null);
+                  }}
                 />
               ))}
             </SortableContext>

@@ -74,6 +74,13 @@ export function useFoyer() {
     [foyer, showError, showSuccess],
   );
 
+  const applySoldeEpargne = useCallback((montant: number) => {
+    setFoyer((prev) => ({
+      ...prev,
+      soldeEpargne: { montant: Math.max(0, montant), updatedAt: new Date().toISOString() },
+    }));
+  }, []);
+
   const updateFoyer = useCallback(
     async (input: PatchFoyerInput) => {
       setIsMutating(true);
@@ -107,6 +114,7 @@ export function useFoyer() {
     isMutating,
     refresh,
     updateSoldeEpargne,
+    applySoldeEpargne,
     updateFoyer,
   };
 }

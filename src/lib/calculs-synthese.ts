@@ -229,6 +229,10 @@ export function calculerEcheances(
     const j = joursEntre(dateRef, finMois);
     const st = statutProjetPourEcheance(p, dateRef);
     const deja = p.montantDeja ?? 0;
+    const moisRestants = nbMoisCalendaires(
+      new Date(dateRef.getFullYear(), dateRef.getMonth(), 1),
+      premierJourMoisYm(p.date),
+    );
     out.push({
       id: `pr-${p.id}-${p.date}`,
       label: p.label,
@@ -237,6 +241,8 @@ export function calculerEcheances(
       montant: p.montant,
       statut: st,
       membreId: p.membreId,
+      projetId: p.id,
+      moisRestants,
       detail: `${Math.round(deja)} € épargnés / ${p.montant} €`,
       delaiLibelle: delaiPresentation(j),
       teinteDelai: teinteDelaiDepuisJours(j, st),
@@ -344,7 +350,13 @@ export function construireDonneesSynthese(p: ParametresSynthese): SyntheseData {
   const chargesTotal = totalChargesMois(charges, moisIndex);
   const resteAVivre = Math.round(revenusTotal - chargesTotal - epargneMensuelle);
 
-  const soldeAttendu = calculerSoldeAttendu(projets, epargneMensuelle, 0, dateRef);
+  // Épargne mensuelle théorique attendue : somme des efforts d'épargne des projets en cours.
+  // (indépendante de l'hypothèse `epargneMensuelle` qui sert au reste à vivre)
+  const epargneAttendueMensuelle = projets
+    .filter((p) => p.statut === "en_cours")
+    .reduce((s, p) => s + (p.epargneMensuelle ?? 0), 0);
+
+  const soldeAttendu = calculerSoldeAttendu(projets, epargneAttendueMensuelle, 0, dateRef);
   const { ecart, statut } = calculerEcartEpargne(soldeEpargneReel, soldeAttendu);
 
   const analyse = analyserMoisCourant(charges, moisIndex);

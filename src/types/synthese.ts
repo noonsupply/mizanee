@@ -21,6 +21,10 @@ export interface Echeance {
   montant: number;
   statut: "ok" | "serre" | "retard" | "info";
   membreId?: string;
+  /** Identifiant du projet source (uniquement pour `type === "projet"`) */
+  projetId?: string;
+  /** Mois restants avant l'échéance du projet (uniquement `type === "projet"`) */
+  moisRestants?: number;
   detail?: string;
   /** Texte du badge urgence (« dans X jours », « dans X semaines », …) */
   delaiLibelle: string;

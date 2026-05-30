@@ -28,6 +28,61 @@
   text-decoration: underline;
 }
 
+.termines {
+  margin-top: 4px;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(226 232 240);
+  background: white;
+  padding: 8px 16px;
+}
+
+.terminesSummary {
+  cursor: pointer;
+  font-size: 13px;
+  color: rgb(100 116 139);
+  padding: 8px 0;
+  user-select: none;
+}
+
+.terminesList {
+  margin-top: 4px;
+}
+
+.termineRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgb(241 245 249);
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.termineRow:last-child {
+  border-bottom: none;
+}
+
+.termineLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: rgb(30 41 59);
+}
+
+.termineCheck {
+  width: 16px;
+  height: 16px;
+  color: #1d9e75;
+  flex-shrink: 0;
+}
+
+.termineMontant {
+  color: rgb(100 116 139);
+  white-space: nowrap;
+}
+
 @media (max-width: 600px) {
   .page {
     padding: 12px;

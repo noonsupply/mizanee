@@ -187,14 +187,43 @@ export function useProjets() {
     [raw, showError, showSuccess],
   );
 
+  const terminerProjet = useCallback(
+    async (id: string, dateDepense?: string): Promise<number | undefined> => {
+      setIsMutating(true);
+      snapshotRef.current = raw;
+      let nouveauSolde: number | undefined;
+      await runOptimisticMutation({
+        applyOptimistic: () => {
+          setRaw((prev) => prev.map((p) => (p.id === id ? { ...p, statut: "ATTEINT" } : p)));
+        },
+        rollback: () => setRaw(snapshotRef.current),
+        mutate: async () => {
+          const data = await api.patch<{ projet: ProjetApi; nouveauSoldeEpargne: number }>(
+            `/api/projets/${id}/terminer`,
+            dateDepense ? { dateDepense } : {},
+          );
+          setRaw((prev) => prev.map((p) => (p.id === id ? data.projet : p)));
+          nouveauSolde = data.nouveauSoldeEpargne;
+          return data;
+        },
+        showError,
+        successMessage: "Projet terminé — solde épargne mis à jour",
+        showSuccess,
+      });
+      setIsMutating(false);
+      return nouveauSolde;
+    },
+    [raw, showError, showSuccess],
+  );
+
   const reorderProjets = useCallback(
     async (ordered: Projet[]) => {
-      const ids = ordered.map((p) => p.id);
+      const items = ordered.map((p, i) => ({ id: p.id, priorite: i + 1 }));
       setIsMutating(true);
       snapshotRef.current = raw;
       await runOptimisticMutation({
         applyOptimistic: () => {
-          const byId = new Map(ordered.map((p, i) => [p.id, i + 1]));
+          const byId = new Map(items.map((it) => [it.id, it.priorite]));
           setRaw((prev) =>
             [...prev]
               .map((p) => ({ ...p, priorite: byId.get(p.id) ?? p.priorite }))
@@ -203,7 +232,7 @@ export function useProjets() {
         },
         rollback: () => setRaw(snapshotRef.current),
         mutate: async () => {
-          const data = await api.patch<{ projets: ProjetApi[] }>("/api/projets/reorder", { ids });
+          const data = await api.patch<{ projets: ProjetApi[] }>("/api/projets/reorder", { items });
           setRaw(data.projets);
           return data.projets.map(mapProjetApiToUi);
         },
@@ -230,6 +259,7 @@ export function useProjets() {
     addProjet,
     updateProjet,
     removeProjet,
+    terminerProjet,
     reorderProjets,
   };
 }

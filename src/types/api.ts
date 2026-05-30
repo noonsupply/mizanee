@@ -51,6 +51,7 @@ export interface ProjetApi {
   statut: string;
   couleur: string;
   emoji: string | null;
+  dateDepense?: string | null;
   foyerId?: string;
   createdAt?: string;
   membres?: { id: string; prenom: string }[];

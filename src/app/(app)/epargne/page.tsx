@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { Check } from "lucide-react";
 import { AllocationBanner } from "@/components/epargne/AllocationBanner";
 import { EpargneMetrics } from "@/components/epargne/EpargneMetrics";
 import { PlanActionCard } from "@/components/epargne/PlanActionCard";
@@ -10,7 +11,7 @@ import { SoldeCumuleChart } from "@/components/epargne/SoldeCumuleChart";
 import { Button } from "@/components/ui/button";
 import { useFoyer } from "@/hooks/useFoyer";
 import { useProjets } from "@/hooks/useProjets";
-import { resteAVivre } from "@/lib/calculs";
+import { formatEur, resteAVivre } from "@/lib/calculs";
 import { allouerSolde, enrichirProjet, projeterSolde } from "@/lib/calculs-projets";
 import { EPARGNE_MENSUELLE } from "@/lib/epargne-constants";
 import { useDebouncedCallback } from "@/lib/use-debounced-callback";
@@ -18,7 +19,13 @@ import type { Projet } from "@/types/projets";
 import styles from "./page.module.css";
 
 export default function EpargnePage() {
-  const { foyer, isLoading: foyerLoading, error: foyerError, refresh: refreshFoyer } = useFoyer();
+  const {
+    foyer,
+    isLoading: foyerLoading,
+    error: foyerError,
+    refresh: refreshFoyer,
+    applySoldeEpargne,
+  } = useFoyer();
   const {
     projets,
     isLoading: projetsLoading,
@@ -27,6 +34,7 @@ export default function EpargnePage() {
     addProjet,
     updateProjet,
     removeProjet,
+    terminerProjet,
     reorderProjets,
   } = useProjets();
 
@@ -50,9 +58,19 @@ export default function EpargnePage() {
     [projetsEffectifs, resteDisponible],
   );
 
+  const projetsEnCours = useMemo(
+    () => projetsCalcules.filter((p) => p.statut === "en_cours"),
+    [projetsCalcules],
+  );
+
   const projetsAlloues = useMemo(
-    () => allouerSolde(projetsCalcules, soldeReel),
-    [projetsCalcules, soldeReel],
+    () => allouerSolde(projetsEnCours, soldeReel),
+    [projetsEnCours, soldeReel],
+  );
+
+  const projetsTermines = useMemo(
+    () => projetsCalcules.filter((p) => p.statut === "atteint"),
+    [projetsCalcules],
   );
 
   const stats = useMemo(
@@ -100,6 +118,30 @@ export default function EpargnePage() {
       return addProjet(projet);
     },
     [addProjet],
+  );
+
+  const onTerminer = useCallback(
+    async (id: string) => {
+      const nouveauSolde = await terminerProjet(id);
+      if (typeof nouveauSolde === "number") {
+        applySoldeEpargne(nouveauSolde);
+      }
+    },
+    [terminerProjet, applySoldeEpargne],
+  );
+
+  const onUpdateProjet = useCallback(
+    (id: string, patch: Partial<Projet> & { date?: string }) => {
+      if (patch.date !== undefined) {
+        setDateOverrides((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+      }
+      void updateProjet(id, patch);
+    },
+    [updateProjet],
   );
 
   const isLoading = projetsLoading || foyerLoading;
@@ -152,6 +194,8 @@ export default function EpargnePage() {
         onRemove={onRemove}
         onReorder={onReorder}
         onAdd={onAdd}
+        onTerminer={onTerminer}
+        onUpdate={onUpdateProjet}
       />
 
       <div className={styles.bottomGrid}>
@@ -160,6 +204,29 @@ export default function EpargnePage() {
       </div>
 
       <PlanActionCard projetsAlloues={projetsAlloues} />
+
+      {projetsTermines.length > 0 ? (
+        <details className={styles.termines}>
+          <summary className={styles.terminesSummary}>
+            {projetsTermines.length} projet{projetsTermines.length > 1 ? "s" : ""} terminé
+            {projetsTermines.length > 1 ? "s" : ""}
+          </summary>
+          <div className={styles.terminesList}>
+            {projetsTermines.map((p) => (
+              <div key={p.id} className={styles.termineRow}>
+                <span className={styles.termineLabel}>
+                  <Check className={styles.termineCheck} aria-hidden />
+                  {p.label}
+                </span>
+                <span className={styles.termineMontant}>
+                  {formatEur(p.montant)}
+                  {p.dateDepense ? ` · ${p.dateDepense}` : ""}
+                </span>
+              </div>
+            ))}
+          </div>
+        </details>
+      ) : null}
     </div>
   );
 }

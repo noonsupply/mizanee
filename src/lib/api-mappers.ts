@@ -194,6 +194,7 @@ export function mapProjetApiToUi(p: ProjetApi): Projet {
     statut: statutMap[p.statut] ?? "en_cours",
     montantDeja: 0,
     epargneMensuelle: p.epargneMensuelle,
+    dateDepense: p.dateDepense ?? null,
   };
 }
 

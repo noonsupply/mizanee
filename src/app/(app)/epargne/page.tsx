@@ -11,7 +11,7 @@ import { useProjets } from "@/hooks/useProjets";
 import { resteAVivre } from "@/lib/calculs";
 import { calculerEcartEpargne, calculerSoldeAttendu } from "@/lib/calculs-synthese";
 import { enrichirProjet, projeterSolde } from "@/lib/calculs-projets";
-import { DATE_DEBUT_EPARGNE_ATTENDU, EPARGNE_MENSUELLE } from "@/lib/epargne-constants";
+import { EPARGNE_MENSUELLE } from "@/lib/epargne-constants";
 import { useDebouncedCallback } from "@/lib/use-debounced-callback";
 import type { Projet } from "@/types/projets";
 import styles from "./page.module.css";
@@ -50,7 +50,7 @@ export default function EpargnePage() {
   const soldeReel = foyer.soldeEpargne.montant;
 
   const soldeAttendu = useMemo(
-    () => calculerSoldeAttendu(projetsEffectifs, DATE_DEBUT_EPARGNE_ATTENDU),
+    () => calculerSoldeAttendu(projetsEffectifs, EPARGNE_MENSUELLE),
     [projetsEffectifs],
   );
 

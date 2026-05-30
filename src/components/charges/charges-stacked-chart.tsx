@@ -19,10 +19,13 @@ import type { ChargeFoyer } from "@/types/charges";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const MOIS_LABELS = MOIS_CLES.map((k) => {
-  const d = new Date(2026, Number(k) - 1, 1);
-  return d.toLocaleDateString("fr-FR", { month: "short" });
-});
+function moisLabelsCourants(): string[] {
+  const year = new Date().getFullYear();
+  return MOIS_CLES.map((k) => {
+    const d = new Date(year, Number(k) - 1, 1);
+    return d.toLocaleDateString("fr-FR", { month: "short" });
+  });
+}
 
 export interface ChargesStackedChartProps {
   charges: ChargeFoyer[];
@@ -33,6 +36,7 @@ export function ChargesStackedChart({ charges, title = "Impact mensuel des charg
   const actives = useMemo(() => charges.filter((c) => c.actif), [charges]);
 
   const data: ChartData<"bar"> = useMemo(() => {
+    const labels = moisLabelsCourants();
     const datasets = actives.map((ch) => ({
       label: ch.label,
       data: MOIS_CLES.map((m) => montantChargePourMois(ch, m)),
@@ -43,7 +47,7 @@ export function ChargesStackedChart({ charges, title = "Impact mensuel des charg
     }));
 
     return {
-      labels: MOIS_LABELS,
+      labels,
       datasets,
     };
   }, [actives]);

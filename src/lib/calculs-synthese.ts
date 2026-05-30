@@ -1,4 +1,4 @@
-import { AUJOURD_HUI } from "@/lib/calculs";
+import { debutAnneeCourante } from "@/lib/date";
 import { COMMUN_MEMBRE, isCommunMembreId } from "@/lib/commun-membre";
 import type { ChargeFoyer } from "@/types/charges";
 import type { Revenu } from "@/types/revenus";
@@ -29,23 +29,36 @@ function nbMoisCalendaires(debut: Date, fin: Date): number {
 }
 
 /**
- * Solde théorique attendu à date sur le compte épargne : pour chaque projet actif,
- * progression linéaire du montant cible entre `dateDebut` et le mois cible `YYYY-MM`.
+ * Calcule combien devrait être sur le compte épargne à ce jour
+ * en fonction des projets et de l'épargne mensuelle (depuis le 1er janvier de l'année en cours).
  */
-export function calculerSoldeAttendu(projets: Projet[], dateDebut: Date, dateRef: Date = AUJOURD_HUI): number {
-  const debut = new Date(dateDebut.getFullYear(), dateDebut.getMonth(), 1);
-  const ref = new Date(dateRef.getFullYear(), dateRef.getMonth(), 1);
-  let sum = 0;
-  for (const p of projets) {
-    if (p.statut !== "en_cours") continue;
-    const fin = premierJourMoisYm(p.date);
-    const total = nbMoisCalendaires(debut, fin);
-    if (total <= 0) continue;
-    const elapsed = Math.min(nbMoisCalendaires(debut, ref), total);
-    const ratio = Math.min(1, elapsed / total);
-    sum += ratio * p.montant;
+export function calculerSoldeAttendu(
+  projets: Projet[],
+  epargneMensuelle: number,
+  soldeDepart = 0,
+  dateRef: Date = new Date(),
+): number {
+  const debut = debutAnneeCourante(dateRef);
+  const aujourdhui = new Date(dateRef.getFullYear(), dateRef.getMonth(), 1);
+
+  const moisEcoules =
+    (aujourdhui.getFullYear() - debut.getFullYear()) * 12 + (aujourdhui.getMonth() - debut.getMonth());
+
+  let solde = soldeDepart;
+  const actifs = projets.filter((p) => p.statut === "en_cours");
+
+  for (let i = 0; i < moisEcoules; i++) {
+    const date = new Date(debut.getFullYear(), debut.getMonth() + i, 1);
+    const moisStr = cleMoisDepuisDate(date);
+
+    solde += epargneMensuelle;
+
+    const decaissement = actifs.filter((p) => p.date === moisStr).reduce((acc, p) => acc + p.montant, 0);
+
+    solde = Math.max(0, solde - decaissement);
   }
-  return Math.round(sum);
+
+  return Math.round(solde);
 }
 
 /**
@@ -114,7 +127,7 @@ function joursEntre(a: Date, b: Date): number {
 }
 
 function statutProjetPourEcheance(p: Projet, dateRef: Date): "ok" | "serre" | "retard" | "info" {
-  const debut = new Date(2026, 0, 1);
+  const debut = debutAnneeCourante(dateRef);
   const ref = new Date(dateRef.getFullYear(), dateRef.getMonth(), dateRef.getDate());
   const fin = premierJourMoisYm(p.date);
   const total = nbMoisCalendaires(debut, fin);
@@ -155,7 +168,7 @@ export function calculerEcheances(
   charges: ChargeFoyer[],
   projets: Projet[],
   soldeEpargne: number,
-  dateRef: Date = AUJOURD_HUI,
+  dateRef: Date = new Date(),
 ): Echeance[] {
   const out: Echeance[] = [];
   const finHorizon = new Date(dateRef);
@@ -258,7 +271,7 @@ export function projeterSoldeNet(
   revenus: Revenu[],
   charges: ChargeFoyer[],
   epargne: number,
-  dateRef: Date = AUJOURD_HUI,
+  dateRef: Date = new Date(),
 ): ProjectionMois[] {
   const moisIdx = dateRef.getMonth();
   const moisNum = pad2(moisIdx + 1);
@@ -316,15 +329,13 @@ export interface ParametresSynthese {
   membres: { id: "p1" | "p2"; prenom: string; color: string }[];
   soldeEpargneReel: number;
   epargneMensuelle: number;
-  dateDebutEpargneAttendu: Date;
 }
 
 /**
  * Assemble toutes les données affichées sur l’écran Synthèse (calculs uniquement).
  */
 export function construireDonneesSynthese(p: ParametresSynthese): SyntheseData {
-  const { dateRef, revenus, charges, projets, membres, soldeEpargneReel, epargneMensuelle, dateDebutEpargneAttendu } =
-    p;
+  const { dateRef, revenus, charges, projets, membres, soldeEpargneReel, epargneMensuelle } = p;
   const moisIndex = dateRef.getMonth();
   const moisLabel = dateRef.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
   const moisNum = pad2(moisIndex + 1);
@@ -333,7 +344,7 @@ export function construireDonneesSynthese(p: ParametresSynthese): SyntheseData {
   const chargesTotal = totalChargesMois(charges, moisIndex);
   const resteAVivre = Math.round(revenusTotal - chargesTotal - epargneMensuelle);
 
-  const soldeAttendu = calculerSoldeAttendu(projets, dateDebutEpargneAttendu, dateRef);
+  const soldeAttendu = calculerSoldeAttendu(projets, epargneMensuelle, 0, dateRef);
   const { ecart, statut } = calculerEcartEpargne(soldeEpargneReel, soldeAttendu);
 
   const analyse = analyserMoisCourant(charges, moisIndex);

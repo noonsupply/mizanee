@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AUJOURD_HUI } from "@/lib/calculs";
+import { getAujourdhui } from "@/lib/date";
 
 export const projetAjoutSchema = z.object({
   label: z.string().min(1, "Libellé requis").max(200),
@@ -10,7 +10,7 @@ export const projetAjoutSchema = z.object({
 
 export type ProjetAjoutValues = z.infer<typeof projetAjoutSchema>;
 
-export function dateProjetEstFuture(dateYm: string, ref: Date = AUJOURD_HUI): boolean {
+export function dateProjetEstFuture(dateYm: string, ref: Date = getAujourdhui()): boolean {
   const [y, m] = dateYm.split("-").map(Number);
   if (!y || !m) return false;
   const premierMoisCible = new Date(y, m - 1, 1);
@@ -24,7 +24,8 @@ export const projetAjoutSchemaAvecDateFuture = projetAjoutSchema.refine(
 );
 
 export function defaultProjetAjoutValues(): ProjetAjoutValues {
-  const d = new Date(AUJOURD_HUI.getFullYear(), AUJOURD_HUI.getMonth() + 2, 1);
+  const ref = getAujourdhui();
+  const d = new Date(ref.getFullYear(), ref.getMonth() + 2, 1);
   const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   return { label: "", montant: 0, date: ym, priorite: 3 };
 }

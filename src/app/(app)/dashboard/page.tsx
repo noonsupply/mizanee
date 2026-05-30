@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type RefObject } from "react";
-import { AUJOURD_HUI } from "@/lib/calculs";
+import { useDate } from "@/hooks/useDate";
 import { useSynthese } from "@/hooks/useSynthese";
 import { foyerNeedsSoldeEpargne } from "@/hooks/useFoyer";
 import { useMembres } from "@/hooks/useMembres";
@@ -41,12 +41,7 @@ export default function DashboardPage() {
   const { synthese, foyer, soldeEpargneUpdatedAt, updateSoldeEpargne, isLoading, error, refresh } = useSynthese();
   const { membres } = useMembres();
 
-  const dateLong = AUJOURD_HUI.toLocaleDateString("fr-FR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const { dateLabel } = useDate();
 
   const actifs = membres.filter((m) => m.actif);
   const prenom = actifs[0]?.prenom ?? "toi";
@@ -72,7 +67,7 @@ export default function DashboardPage() {
       <header className="flex flex-col gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Bonjour {prenom}</h1>
-          <p className="mt-1 capitalize text-slate-500">{dateLong}</p>
+          <p className="mt-1 capitalize text-slate-500">{dateLabel}</p>
         </div>
         <div className="flex -space-x-2" aria-label="Membres du foyer">
           {actifs.map((m) => (

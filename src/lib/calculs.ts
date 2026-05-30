@@ -1,7 +1,7 @@
 import { personnes, revenuLocatif, chargesCommunes, chargesP1, chargesP2 } from "@/data/foyer";
 import type { ProjetEpargne } from "@/data/foyer";
 
-export const AUJOURD_HUI = new Date(2026, 4, 10); // 10 mai 2026
+export { getAujourdhui } from "@/lib/date";
 
 export function totalRevenus(): number {
   return personnes.reduce((s, p) => s + p.revenu, 0) + revenuLocatif;
@@ -39,10 +39,10 @@ export function repartitionProrata(): { P1: number; P2: number } {
 }
 
 export function moisRestants(dateObjectif: string): number {
+  const aujourdhui = new Date();
   const target = new Date(dateObjectif);
   const diff =
-    (target.getFullYear() - AUJOURD_HUI.getFullYear()) * 12 +
-    (target.getMonth() - AUJOURD_HUI.getMonth());
+    (target.getFullYear() - aujourdhui.getFullYear()) * 12 + (target.getMonth() - aujourdhui.getMonth());
   return Math.max(0, diff);
 }
 
@@ -77,8 +77,9 @@ export function simulationSolde(projets: ProjetEpargne[]): PointProjection[] {
   const net = revenus - charges - epargne;
 
   let cumul = 0;
+  const aujourdhui = new Date();
   return Array.from({ length: 12 }, (_, i) => {
-    const date = new Date(AUJOURD_HUI.getFullYear(), AUJOURD_HUI.getMonth() + i + 1, 1);
+    const date = new Date(aujourdhui.getFullYear(), aujourdhui.getMonth() + i + 1, 1);
     const mois = date.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
     cumul += net;
     return {

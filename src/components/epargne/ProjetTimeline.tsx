@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { AUJOURD_HUI } from "@/lib/calculs";
 import { iter24Mois } from "@/lib/calculs-projets";
 import type { ProjetCalcule } from "@/types/projets";
 import styles from "./ProjetTimeline.module.css";
@@ -26,7 +25,7 @@ export interface ProjetTimelineProps {
 }
 
 export function ProjetTimeline({ projets, nbMois = 24 }: ProjetTimelineProps) {
-  const mois = useMemo(() => iter24Mois(AUJOURD_HUI).slice(0, nbMois), [nbMois]);
+  const mois = useMemo(() => iter24Mois(new Date()).slice(0, nbMois), [nbMois]);
   const actifs = useMemo(() => projets.filter((p) => p.statut === "en_cours"), [projets]);
 
   const headerTicks = useMemo(() => {

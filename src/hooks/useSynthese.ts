@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { AUJOURD_HUI } from "@/lib/calculs";
+import { getAujourdhui } from "@/lib/date";
 import { buildMembreSlotMap, mapChargeApiToFoyer } from "@/lib/api-mappers";
 import { construireDonneesSynthese } from "@/lib/calculs-synthese";
 import { useCharges } from "@/hooks/useCharges";
@@ -14,14 +14,11 @@ import type { SyntheseData } from "@/types/synthese";
 
 export interface UseSyntheseOptions {
   epargneMensuelle?: number;
-  dateDebutEpargneAttendu?: Date;
   dateRef?: Date;
 }
 
 const DEFAULTS = {
   epargneMensuelle: 0,
-  dateDebutEpargneAttendu: new Date(2026, 0, 1),
-  dateRef: AUJOURD_HUI,
 } as const;
 
 export function useSynthese(options: UseSyntheseOptions = {}) {
@@ -40,8 +37,7 @@ export function useSynthese(options: UseSyntheseOptions = {}) {
   const { membres, isLoading: loadingMembres, error: errorMembres, refresh: refreshMembres } = useMembres();
 
   const epargneMensuelle = options.epargneMensuelle ?? DEFAULTS.epargneMensuelle;
-  const dateDebutEpargneAttendu = options.dateDebutEpargneAttendu ?? DEFAULTS.dateDebutEpargneAttendu;
-  const dateRef = options.dateRef ?? DEFAULTS.dateRef;
+  const dateRef = options.dateRef ?? getAujourdhui();
 
   const foyerSafe = foyer ?? EMPTY_FOYER;
   const soldeEpargne = foyerSafe.soldeEpargne ?? EMPTY_FOYER.soldeEpargne;
@@ -76,7 +72,6 @@ export function useSynthese(options: UseSyntheseOptions = {}) {
       membres: membresSynth,
       soldeEpargneReel,
       epargneMensuelle,
-      dateDebutEpargneAttendu,
     });
   }, [
     loadingRevenus,
@@ -90,7 +85,6 @@ export function useSynthese(options: UseSyntheseOptions = {}) {
     membres,
     soldeEpargneReel,
     epargneMensuelle,
-    dateDebutEpargneAttendu,
     dateRef,
   ]);
 

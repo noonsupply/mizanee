@@ -1,16 +1,17 @@
-import { AUJOURD_HUI } from "@/lib/calculs";
 import type { PointSolde, Projet, ProjetCalcule, StatutFaisabilite, StatutProjet } from "@/types/projets";
 
 /**
- * Nombre de mois calendaires entre « aujourd’hui » et le premier jour du mois cible `YYYY-MM`.
+ * Calcule le nombre de mois entre aujourd'hui et la date cible (1er du mois `YYYY-MM`).
  */
-export function calculerMoisRestants(date: string, aujourdhui: Date = AUJOURD_HUI): number {
-  const [y, m] = date.split("-").map(Number);
-  if (!y || !m) return 0;
-  const cible = new Date(y, m - 1, 1);
+export function calculerMoisRestants(date: string, aujourdhui: Date = new Date()): number {
+  const [year, month] = date.split("-").map(Number);
+  if (!year || !month) return 1;
+  const dateCible = new Date(year, month - 1, 1);
+
   const diff =
-    (cible.getFullYear() - aujourdhui.getFullYear()) * 12 + (cible.getMonth() - aujourdhui.getMonth());
-  return Math.max(0, diff);
+    (dateCible.getFullYear() - aujourdhui.getFullYear()) * 12 + (dateCible.getMonth() - aujourdhui.getMonth());
+
+  return Math.max(1, diff);
 }
 
 /**
@@ -23,7 +24,7 @@ export function calculerEpargneMensuelle(montant: number, moisRestants: number):
 }
 
 /**
- * Faisabilité en comparant l’épargne mensuelle requise au reste disponible mensuel (après charges, etc.).
+ * Faisabilité en comparant l'épargne mensuelle requise au reste disponible mensuel (après charges, etc.).
  */
 export function calculerFaisabilite(epargneMensuelle: number, resteDisponible: number): StatutFaisabilite {
   if (!Number.isFinite(epargneMensuelle) || epargneMensuelle <= 0) return "faisable";
@@ -60,9 +61,7 @@ export function enrichirProjet(projet: Projet, resteDisponible: number): ProjetC
 }
 
 function moisCleDepuisDate(d: Date): string {
-  const y = d.getFullYear();
-  const m = d.getMonth() + 1;
-  return `${y}-${String(m).padStart(2, "0")}`;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
 function labelMoisCourt(d: Date): string {
@@ -70,36 +69,34 @@ function labelMoisCourt(d: Date): string {
 }
 
 /**
- * Projection du solde cumulé sur `nbMois` mois : épargne mensuelle ajoutée, décaissements aux dates cibles.
+ * Projette le solde épargne sur `nbMois` à partir d'aujourd'hui.
  */
 export function projeterSolde(
   projets: Projet[],
   soldeInitial: number,
   epargneMensuelle: number,
   nbMois = 24,
-  aujourdhui: Date = AUJOURD_HUI,
+  aujourdhui: Date = new Date(),
 ): PointSolde[] {
   const actifs = projets.filter((p) => p.statut === ("en_cours" as StatutProjet));
   const points: PointSolde[] = [];
-  let cumul = soldeInitial;
+  let solde = soldeInitial;
 
   for (let i = 0; i < nbMois; i++) {
-    const d = new Date(aujourdhui.getFullYear(), aujourdhui.getMonth() + i, 1);
-    const cle = moisCleDepuisDate(d);
-    let decaissement = 0;
-    const projetsDecaisses: string[] = [];
+    const date = new Date(aujourdhui.getFullYear(), aujourdhui.getMonth() + i, 1);
+    const moisStr = moisCleDepuisDate(date);
+    const moisLabel = labelMoisCourt(date);
 
-    for (const p of actifs) {
-      if (p.date === cle) {
-        decaissement += p.montant;
-        projetsDecaisses.push(p.label);
-      }
-    }
+    solde += epargneMensuelle;
 
-    cumul += epargneMensuelle - decaissement;
+    const projetsDecaisses = actifs.filter((p) => p.date === moisStr).map((p) => p.label);
+    const decaissement = actifs.filter((p) => p.date === moisStr).reduce((acc, p) => acc + p.montant, 0);
+
+    solde = Math.max(0, solde - decaissement);
+
     points.push({
-      mois: labelMoisCourt(d),
-      solde: Math.round(cumul),
+      mois: moisLabel,
+      solde: Math.round(solde),
       decaissement,
       projetsDecaisses,
     });
@@ -119,8 +116,8 @@ export function detecterMoisTendus(points: PointSolde[], seuil = 0): number[] {
   return out;
 }
 
-/** 24 mois consécutifs à partir de `aujourdhui` (1er du mois). */
-export function iter24Mois(aujourdhui: Date = AUJOURD_HUI): { cle: string; label: string }[] {
+/** 24 mois consécutifs à partir d'aujourd'hui (1er du mois). */
+export function iter24Mois(aujourdhui: Date = new Date()): { cle: string; label: string }[] {
   const out: { cle: string; label: string }[] = [];
   for (let i = 0; i < 24; i++) {
     const d = new Date(aujourdhui.getFullYear(), aujourdhui.getMonth() + i, 1);
@@ -132,6 +129,5 @@ export function iter24Mois(aujourdhui: Date = AUJOURD_HUI): { cle: string; label
 }
 
 export function indexMoisDansHorizon(dateYm: string, mois: { cle: string }[]): number {
-  const i = mois.findIndex((m) => m.cle === dateYm);
-  return i;
+  return mois.findIndex((m) => m.cle === dateYm);
 }

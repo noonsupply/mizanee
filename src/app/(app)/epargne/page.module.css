@@ -24,7 +24,7 @@
 
 .alertLink {
   font-weight: 600;
-  color: rgb(127 119 221);
+  color: var(--mz-green);
   text-decoration: underline;
 }
 

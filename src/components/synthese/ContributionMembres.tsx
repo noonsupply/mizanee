@@ -20,15 +20,15 @@ export function ContributionMembres({ membres, commun, totalChargesCommunes }: C
   const showCommun = commun.charges > 0 || commun.revenus > 0;
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <h2 className="text-sm font-semibold text-slate-800">Contributions membres</h2>
-      <p className="mt-0.5 text-xs text-slate-500">
+    <div className="mz-card p-5">
+      <h2 className="text-sm font-semibold text-[var(--mz-ink)]">Contributions membres</h2>
+      <p className="mt-0.5 text-xs text-[var(--mz-ink-muted)]">
         Charges communes totales :{" "}
-        <span className="font-semibold text-slate-700">{formatEur(totalChargesCommunes)}</span>
+        <span className="font-semibold text-[var(--mz-ink-soft)]">{formatEur(totalChargesCommunes)}</span>
       </p>
 
       {showCommun && (
-        <div className="mt-4 rounded-lg border border-amber-200/80 bg-amber-50/60 px-3 py-3">
+        <div className="badge-warning mt-4 rounded-[var(--mz-radius-md)] px-3 py-3">
           <div className="flex items-start gap-3">
             <span
               className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full"
@@ -37,13 +37,13 @@ export function ContributionMembres({ membres, commun, totalChargesCommunes }: C
             />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="font-semibold text-slate-900">{commun.label}</span>
+                <span className="font-semibold text-[var(--mz-ink)]">{commun.label}</span>
                 {commun.revenus > 0 && (
-                  <span className="text-sm text-slate-600">{formatEur(commun.revenus)} revenus</span>
+                  <span className="text-sm text-[var(--mz-ink-muted)]">{formatEur(commun.revenus)} revenus</span>
                 )}
               </div>
-              <p className="mt-1 text-xs text-slate-500">
-                Charges communes : <span className="font-medium text-slate-700">{formatEur(commun.charges)}</span>
+              <p className="mt-1 text-xs text-[var(--mz-ink-muted)]">
+                Charges communes : <span className="font-medium text-[var(--mz-ink-soft)]">{formatEur(commun.charges)}</span>
               </p>
             </div>
           </div>
@@ -66,26 +66,22 @@ export function ContributionMembres({ membres, commun, totalChargesCommunes }: C
             <div
               key={`rav-${m.id}`}
               className={cn(
-                "rounded-lg border p-3",
-                critique
-                  ? "border-rose-200 bg-rose-50"
-                  : tendu
-                    ? "border-amber-200 bg-amber-50"
-                    : "border-emerald-200 bg-emerald-50",
+                "rounded-[var(--mz-radius-md)] p-3",
+                critique ? "badge-danger" : tendu ? "badge-warning" : "badge-success",
               )}
             >
-              <p className="text-xs font-medium text-slate-600">Reste à vivre net · {m.prenom}</p>
+              <p className="text-xs font-medium text-[var(--mz-ink-muted)]">Reste à vivre net · {m.prenom}</p>
               <p
                 className={cn(
                   "mt-1 text-lg font-bold",
-                  critique ? "text-rose-900" : tendu ? "text-amber-900" : "text-emerald-900",
+                  critique ? "text-[#791F1F]" : tendu ? "text-[#633806]" : "text-[var(--mz-green-deep)]",
                 )}
                 role="status"
                 aria-label={`Reste à vivre net ${m.prenom} ${formatEur(m.resteAVivreNet)}`}
               >
                 {formatEur(m.resteAVivreNet)}
               </p>
-              <p className="mt-1 text-[11px] text-slate-500">Après perso, commun (prorata) et épargne imputée</p>
+              <p className="mt-1 text-[11px] opacity-80">Après perso, commun (prorata) et épargne imputée</p>
             </div>
           );
         })}
@@ -106,16 +102,16 @@ function MembreContributionRow({ membre: m }: { membre: SyntheseMembreLigne }) {
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <span className="font-semibold text-slate-900">{m.prenom}</span>
-          <span className="text-sm text-slate-600">
-            {formatEur(m.revenus)} · <span className="text-slate-500">{m.partFoyerPct}% du foyer</span>
+          <span className="font-semibold text-[var(--mz-ink)]">{m.prenom}</span>
+          <span className="text-sm text-[var(--mz-ink-muted)]">
+            {formatEur(m.revenus)} · <span>{m.partFoyerPct}% du foyer</span>
           </span>
         </div>
-        <p className="mt-1 text-xs text-slate-500">
-          Part charges communes : <span className="font-medium text-slate-700">{formatEur(m.chargesCommunes)}</span>
+        <p className="mt-1 text-xs text-[var(--mz-ink-muted)]">
+          Part charges communes : <span className="font-medium text-[var(--mz-ink-soft)]">{formatEur(m.chargesCommunes)}</span>
         </p>
         <div
-          className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100"
+          className="mt-2 h-2 overflow-hidden rounded-full bg-[#E0E8E4]"
           role="progressbar"
           aria-valuenow={m.prorata}
           aria-valuemin={0}

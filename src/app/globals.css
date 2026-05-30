@@ -1,26 +1,122 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: var(--mz-surface);
+  --foreground: var(--mz-ink);
+  color-scheme: light;
+}
+
+/* Empêche le thème sombre automatique (fond noir + cartes blanches) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--mz-surface);
+    --foreground: var(--mz-ink);
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-manrope);
+  --font-mono: var(--font-manrope);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  --color-indigo-50: #e1f5ee;
+  --color-indigo-100: #c9eddf;
+  --color-indigo-200: #9fe1cb;
+  --color-indigo-300: #6fcfb1;
+  --color-indigo-400: #38b895;
+  --color-indigo-500: #1d9e75;
+  --color-indigo-600: #0f6e56;
+  --color-indigo-700: #0c5a47;
+  --color-indigo-800: #085041;
+  --color-indigo-900: #06382e;
+  --color-indigo-950: #042019;
+}
+
+html {
+  background: var(--mz-surface);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-manrope), "Helvetica Neue", Arial, sans-serif;
+  background: var(--mz-surface);
+  color: var(--mz-ink);
+}
+
+/* Cartes Mizanee */
+.mz-card {
+  background: var(--mz-white);
+  border: 0.5px solid #e0e8e4;
+  border-radius: var(--mz-radius-lg);
+  box-shadow: 0 1px 3px rgb(26 26 31 / 0.04);
+}
+
+.mz-card-accent {
+  border-left: 3px solid var(--mz-green);
+  border-radius: 0 var(--mz-radius-lg) var(--mz-radius-lg) 0;
+}
+
+.mz-metric-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mz-ink-muted);
+}
+
+.mz-metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--mz-ink);
+}
+
+.mz-metric-positive {
+  color: var(--mz-green);
+}
+
+.mz-metric-negative {
+  color: #e24b4a;
+}
+
+/* Badges */
+.badge-success {
+  background: var(--mz-green-bg);
+  color: var(--mz-green-deep);
+  border: 0.5px solid var(--mz-green-border);
+}
+
+.badge-warning {
+  background: #faeeda;
+  color: #633806;
+  border: 0.5px solid #fac775;
+}
+
+.badge-danger {
+  background: #fcebeb;
+  color: #791f1f;
+  border: 0.5px solid #f09595;
+}
+
+.badge-info {
+  background: #e6f1fb;
+  color: #0c447c;
+  border: 0.5px solid #85b7eb;
+}
+
+input,
+select,
+textarea {
+  font-family: var(--font-manrope), "Helvetica Neue", Arial, sans-serif;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--mz-green);
+  box-shadow: 0 0 0 3px rgba(15, 110, 86, 0.12);
 }

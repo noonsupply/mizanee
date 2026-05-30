@@ -46,9 +46,9 @@ export function RepartitionDonut({ repartition }: RepartitionDonutProps) {
   );
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <h2 className="text-sm font-semibold text-slate-800">Répartition du budget</h2>
-      <p className="mt-0.5 text-xs text-slate-500">Répartition indicative du mois</p>
+    <div className="mz-card p-5">
+      <h2 className="text-sm font-semibold text-[var(--mz-ink)]">Répartition du budget</h2>
+      <p className="mt-0.5 text-xs text-[var(--mz-ink-muted)]">Répartition indicative du mois</p>
       <div className="mt-4 flex flex-col items-stretch gap-6 lg:flex-row lg:items-center">
         <div className="mx-auto w-full max-w-[220px] shrink-0" role="img" aria-label="Graphique en anneau : répartition du budget par poste">
           <Doughnut data={data} options={options} />
@@ -60,11 +60,11 @@ export function RepartitionDonut({ repartition }: RepartitionDonutProps) {
               <li key={r.label} className="flex items-center justify-between gap-3">
                 <span className="flex min-w-0 items-center gap-2">
                   <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ backgroundColor: r.color }} aria-hidden />
-                  <span className="truncate font-medium text-slate-800">{r.label}</span>
+                  <span className="truncate font-medium text-[var(--mz-ink-soft)]">{r.label}</span>
                 </span>
-                <span className="shrink-0 text-right text-slate-600">
-                  <span className="font-semibold text-slate-900">{formatEur(r.montant)}</span>
-                  <span className="ml-2 text-xs text-slate-500">({pct}%)</span>
+                <span className="shrink-0 text-right text-[var(--mz-ink-muted)]">
+                  <span className="font-semibold text-[var(--mz-ink)]">{formatEur(r.montant)}</span>
+                  <span className="ml-2 text-xs">({pct}%)</span>
                 </span>
               </li>
             );

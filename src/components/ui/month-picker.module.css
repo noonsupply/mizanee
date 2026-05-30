@@ -1,0 +1,126 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 13px;
+  text-align: left;
+  color: rgb(15 23 42);
+  background: white;
+  border: 1px solid rgb(226 232 240);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.trigger:hover {
+  border-color: rgb(203 213 225);
+}
+
+.trigger:focus-visible {
+  outline: none;
+  border-color: var(--mz-green);
+  box-shadow: 0 0 0 3px rgba(15, 110, 86, 0.12);
+}
+
+.trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.triggerLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+.popover {
+  position: fixed;
+  z-index: 60;
+  padding: 12px;
+  background: white;
+  border: 1px solid rgb(226 232 240);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgb(15 23 42 / 0.16);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: rgb(71 85 105);
+  background: rgb(248 250 252);
+  border: 1px solid rgb(226 232 240);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.navBtn:hover {
+  background: rgb(241 245 249);
+}
+
+.year {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgb(15 23 42);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.cell {
+  padding: 9px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(51 65 85);
+  background: rgb(248 250 252);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: capitalize;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.cell:hover {
+  background: var(--mz-green-bg);
+  color: var(--mz-green-deep);
+}
+
+.cellActif {
+  background: var(--mz-green);
+  color: white;
+}
+
+.cellActif:hover {
+  background: var(--mz-green-deep);
+  color: white;
+}
+
+.cell:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  background: transparent;
+  color: rgb(148 163 184);
+}
+
+.cell:disabled:hover {
+  background: transparent;
+  color: rgb(148 163 184);
+}

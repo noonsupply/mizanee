@@ -18,9 +18,9 @@ import type { PointSolde } from "@/types/projets";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Filler);
 
-const LINE = "#7F77DD";
-const FILL = "rgba(127, 119, 221, 0.14)";
-const POINT_NORMAL = "#7F77DD";
+const LINE = "#0F6E56";
+const FILL = "rgba(15, 110, 86, 0.14)";
+const POINT_NORMAL = "#0F6E56";
 const POINT_DEC = "#E24B4A";
 
 export interface SoldeCumuleChartProps {

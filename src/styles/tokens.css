@@ -1,0 +1,16 @@
+:root {
+  --mz-green:        #0F6E56;
+  --mz-green-deep:   #085041;
+  --mz-green-light:  #1D9E75;
+  --mz-green-bg:     #E1F5EE;
+  --mz-green-border: #9FE1CB;
+  --mz-ink:          #1A1A1F;
+  --mz-ink-soft:     #3D4440;
+  --mz-ink-muted:    #6B716C;
+  --mz-surface:      #F7FAF9;
+  --mz-white:        #FFFFFF;
+  --mz-radius-sm:    6px;
+  --mz-radius-md:    10px;
+  --mz-radius-lg:    14px;
+  --mz-radius-xl:    20px;
+}

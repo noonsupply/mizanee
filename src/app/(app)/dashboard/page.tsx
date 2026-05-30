@@ -16,16 +16,16 @@ import { Button } from "@/components/ui/button";
 
 function DashboardSkeleton() {
   return (
-    <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 lg:px-6">
-      <div className="h-10 w-48 animate-pulse rounded-lg bg-slate-200" />
+    <div className="space-y-6">
+      <div className="h-10 w-48 animate-pulse rounded-lg bg-[#E0E8E4]" />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-24 animate-pulse rounded-xl bg-slate-100" />
+          <div key={i} className="h-28 animate-pulse rounded-[var(--mz-radius-lg)] bg-[#E0E8E4]/60" />
         ))}
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="h-64 animate-pulse rounded-xl bg-slate-100" />
-        <div className="h-64 animate-pulse rounded-xl bg-slate-100" />
+        <div className="h-64 animate-pulse rounded-[var(--mz-radius-lg)] bg-[#E0E8E4]/60" />
+        <div className="h-64 animate-pulse rounded-[var(--mz-radius-lg)] bg-[#E0E8E4]/60" />
       </div>
     </div>
   );
@@ -80,17 +80,18 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 lg:px-6">
-      <header className="flex flex-col gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-6">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Bonjour {prenom}</h1>
-          <p className="mt-1 capitalize text-slate-500">{dateLabel}</p>
+          <p className="text-sm font-medium text-[var(--mz-green)]">Synthèse</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-[var(--mz-ink)]">Bonjour {prenom}</h1>
+          <p className="mt-1 capitalize text-[var(--mz-ink-muted)]">{dateLabel}</p>
         </div>
         <div className="flex -space-x-2" aria-label="Membres du foyer">
           {actifs.map((m) => (
             <div
               key={m.id}
-              className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-white text-xs font-bold text-white shadow-md"
+              className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[var(--mz-white)] text-xs font-bold text-white shadow-sm ring-1 ring-[#E0E8E4]"
               style={{ backgroundColor: m.couleur }}
               title={m.prenom}
             >

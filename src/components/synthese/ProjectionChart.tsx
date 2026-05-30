@@ -93,9 +93,9 @@ export function ProjectionChart({ projection }: ProjectionChartProps) {
   );
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <h2 className="text-sm font-semibold text-slate-800">Projection solde net (12 mois)</h2>
-      <p className="mt-0.5 text-xs text-slate-500">Points rouges : mois tendus (net sous 85 % de la moyenne)</p>
+    <div className="mz-card p-5">
+      <h2 className="text-sm font-semibold text-[var(--mz-ink)]">Projection solde net (12 mois)</h2>
+      <p className="mt-0.5 text-xs text-[var(--mz-ink-muted)]">Points rouges : mois tendus (net sous 85 % de la moyenne)</p>
       <div className="mt-3 h-[260px] w-full" role="img" aria-label="Courbe de projection du solde net cumulé sur 12 mois">
         <Line data={data} options={options} />
       </div>

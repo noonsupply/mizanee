@@ -15,6 +15,30 @@ export interface MetriquesBarProps {
   soldeEpargneWidgetRef?: RefObject<SoldeEpargneWidgetHandle | null>;
 }
 
+function MetricTile({
+  id,
+  label,
+  value,
+  sub,
+  valueClassName,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  sub: string;
+  valueClassName?: string;
+}) {
+  return (
+    <section className="mz-card flex flex-col p-5" aria-labelledby={id}>
+      <h2 id={id} className="mz-metric-label">
+        {label}
+      </h2>
+      <p className={cn("mz-metric-value mt-2", valueClassName)}>{value}</p>
+      <p className="mt-1.5 text-xs text-[var(--mz-ink-muted)]">{sub}</p>
+    </section>
+  );
+}
+
 export function MetriquesBar({
   data,
   soldeEpargneMontant,
@@ -25,64 +49,54 @@ export function MetriquesBar({
 }: MetriquesBarProps) {
   const badgeEpargne =
     data.statutEpargne === "avance"
-      ? { label: `En avance +${formatEur(data.ecartEpargne)}`, className: "bg-emerald-100 text-emerald-900 border-emerald-200" }
+      ? { label: `En avance +${formatEur(data.ecartEpargne)}`, className: "badge-success" }
       : data.statutEpargne === "retard"
-        ? { label: `Retard ${formatEur(Math.abs(data.ecartEpargne))}`, className: "bg-rose-100 text-rose-900 border-rose-200" }
-        : { label: "À jour", className: "bg-slate-100 text-slate-700 border-slate-200" };
+        ? { label: `Retard ${formatEur(Math.abs(data.ecartEpargne))}`, className: "badge-danger" }
+        : { label: "À jour", className: "badge-info" };
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm" aria-labelledby="m-rev">
-        <h2 id="m-rev" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-          Revenus
-        </h2>
-        <p className="mt-2 text-2xl font-bold text-emerald-700">{formatEur(data.revenus)}</p>
-        <p className="mt-1 text-xs text-slate-500">{data.libelleSecondaireRevenus}</p>
-      </section>
-
-      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm" aria-labelledby="m-ch">
-        <h2 id="m-ch" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-          Charges
-        </h2>
-        <p
-          className={cn(
-            "mt-2 text-2xl font-bold",
-            data.chargesTonSurcote ? "text-amber-700" : "text-slate-900",
-          )}
-        >
-          {formatEur(data.charges)}
-        </p>
-        <p className="mt-1 text-xs text-slate-500">{data.libelleSecondaireCharges}</p>
-      </section>
-
-      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm" aria-labelledby="m-rav">
-        <h2 id="m-rav" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-          Reste à vivre
-        </h2>
-        <p className="mt-2 text-2xl font-bold text-slate-900">{formatEur(data.resteAVivre)}</p>
-        <p className="mt-1 text-xs text-slate-500">{data.pourcentageRavSurRevenus}% des revenus</p>
-      </section>
-
-      <div className="met">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <MetricTile
+        id="m-rev"
+        label="Revenus"
+        value={formatEur(data.revenus)}
+        sub={data.libelleSecondaireRevenus}
+        valueClassName="mz-metric-positive"
+      />
+      <MetricTile
+        id="m-ch"
+        label="Charges"
+        value={formatEur(data.charges)}
+        sub={data.libelleSecondaireCharges}
+        valueClassName={data.chargesTonSurcote ? "text-[#B45309]" : undefined}
+      />
+      <MetricTile
+        id="m-rav"
+        label="Reste à vivre"
+        value={formatEur(data.resteAVivre)}
+        sub={`${data.pourcentageRavSurRevenus}% des revenus`}
+      />
+      <section className="mz-card mz-card-accent flex flex-col p-5" aria-labelledby="m-ep">
         <SoldeEpargneWidget
           ref={soldeEpargneWidgetRef}
           montant={soldeEpargneMontant}
           updatedAt={soldeEpargneUpdatedAt}
           onUpdate={onUpdateSoldeEpargne}
           needsSetup={soldeEpargneNeedsSetup}
+          embedded
         />
-        <p className="mt-2 text-center text-xs text-slate-500">
-          Attendu : <span className="font-semibold text-slate-700">{formatEur(data.soldeEpargneAttendu)}</span>
-        </p>
-        <p className="mt-2 flex justify-center">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#E0E8E4] pt-3">
+          <p className="text-xs text-[var(--mz-ink-muted)]">
+            Attendu : <span className="font-semibold text-[var(--mz-ink-soft)]">{formatEur(data.soldeEpargneAttendu)}</span>
+          </p>
           <span
             role="status"
-            className={cn("inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold", badgeEpargne.className)}
+            className={cn("inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold", badgeEpargne.className)}
           >
             {badgeEpargne.label}
           </span>
-        </p>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

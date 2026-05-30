@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { StepIndicator } from "@/components/onboarding/StepIndicator";
@@ -45,6 +46,17 @@ export default function OnboardingPage() {
 
   return (
     <div className="w-full max-w-2xl space-y-6">
+      <div className="flex flex-col items-center rounded-(--mz-radius-xl) bg-(--mz-green) px-8 py-8 text-center">
+        <Image
+          src="/logo/mizanee-white.svg"
+          alt="Mizanee"
+          width={140}
+          height={32}
+          className="h-8 w-auto"
+          priority
+        />
+        <p className="mt-3 text-sm text-white/80">Configurons votre foyer en quelques étapes</p>
+      </div>
       <StepIndicator current={step} labels={STEP_LABELS} />
       {step === 1 && (
         <StepFoyer

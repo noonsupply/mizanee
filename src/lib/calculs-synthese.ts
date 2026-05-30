@@ -411,11 +411,11 @@ export function construireDonneesSynthese(p: ParametresSynthese): SyntheseData {
   };
 
   const repartitionBudget: SyntheseData["repartitionBudget"] = [
-    { label: "Charges communes", montant: communes, color: COMMUN_MEMBRE.couleur },
+    { label: "Charges communes", montant: communes, color: "#D85A30" },
     { label: `Perso ${prenom1}`, montant: perso1, color: "#378ADD" },
-    { label: `Perso ${prenom2}`, montant: perso2, color: "#1D9E75" },
-    { label: "Épargne prévue", montant: epargneMensuelle, color: "#7F77DD" },
-    { label: "Reste à vivre", montant: Math.max(0, resteAVivre), color: "#10b981" },
+    { label: `Perso ${prenom2}`, montant: perso2, color: "#5DCAA5" },
+    { label: "Épargne prévue", montant: epargneMensuelle, color: "#0F6E56" },
+    { label: "Reste à vivre", montant: Math.max(0, resteAVivre), color: "#1D9E75" },
   ];
 
   const echeancesBrutes = calculerEcheances(charges, projets, soldeEpargneReel, dateRef);

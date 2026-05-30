@@ -18,10 +18,11 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BadgeCheck, CalendarDays, Clock, Flame, GripVertical, Pencil, Trash2 } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { MonthPicker } from "@/components/ui/month-picker";
 import { useMembres } from "@/hooks/useMembres";
 import { formatEur } from "@/lib/calculs";
 import {
@@ -32,7 +33,7 @@ import {
 import type { Projet, ProjetAlloue, StatutAllocation, StatutProjet, UrgenceProjet } from "@/types/projets";
 import styles from "./ProjetTable.module.css";
 
-const COULEURS_DEFAUT = ["#7F77DD", "#1D9E75", "#D85A30", "#378ADD", "#D4537E", "#EF9F27", "#5DCAA5"] as const;
+const COULEURS_DEFAUT = ["#0F6E56", "#1D9E75", "#D85A30", "#378ADD", "#D4537E", "#EF9F27", "#5DCAA5"] as const;
 
 function nouvelIdProjet(): string {
   if (typeof globalThis.crypto !== "undefined" && "randomUUID" in globalThis.crypto) {
@@ -43,10 +44,15 @@ function nouvelIdProjet(): string {
   return `p-${Math.round(n)}`;
 }
 
+function moisCourantStr(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
 function couleurPourSeed(seed: string): string {
   let h = 0;
   for (let i = 0; i < seed.length; i += 1) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  return COULEURS_DEFAUT[h % COULEURS_DEFAUT.length] ?? "#7F77DD";
+  return COULEURS_DEFAUT[h % COULEURS_DEFAUT.length] ?? "#0F6E56";
 }
 
 function stripCalcule(p: ProjetAlloue): Projet {
@@ -201,12 +207,12 @@ function ProjetEditForm({ projet, onSave, onCancel }: ProjetEditFormProps) {
         <label className={styles.formLabel} htmlFor={`edit-date-${projet.id}`}>
           Date cible
         </label>
-        <input
+        <MonthPicker
           id={`edit-date-${projet.id}`}
-          type="month"
-          className={styles.formInput}
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={setDate}
+          minMois={moisCourantStr()}
+          ariaLabel={`Date cible pour ${projet.label}`}
         />
       </div>
       <div className={styles.editField}>
@@ -301,12 +307,11 @@ function SortableProjetRow({
             {membreLabel ? ` · ${membreLabel}` : ""}
           </p>
         </div>
-        <input
-          type="month"
-          className={styles.dateInput}
+        <MonthPicker
           value={projet.date}
-          onChange={(e) => onDateChange(projet.id, e.target.value)}
-          aria-label={`Date cible pour ${projet.label}`}
+          onChange={(v) => onDateChange(projet.id, v)}
+          minMois={moisCourantStr()}
+          ariaLabel={`Date cible pour ${projet.label}`}
         />
         <span className={`${styles.badge} ${urgenceClass(projet.urgence)}`}>
           <UrgenceIcon urgence={projet.urgence} />
@@ -353,14 +358,14 @@ function SortableProjetRow({
           {membreLabel ? ` · ${membreLabel}` : ""}
         </p>
         <div className={styles.cardRow2}>
-          <span>
+          <span className={styles.cardDateField}>
             <label htmlFor={`date-m-${projet.id}`}>Date:</label>
-            <input
+            <MonthPicker
               id={`date-m-${projet.id}`}
-              type="month"
-              className={styles.dateInput}
               value={projet.date}
-              onChange={(e) => onDateChange(projet.id, e.target.value)}
+              onChange={(v) => onDateChange(projet.id, v)}
+              minMois={moisCourantStr()}
+              ariaLabel={`Date cible pour ${projet.label}`}
             />
           </span>
         </div>
@@ -452,7 +457,7 @@ export function ProjetTable({
     defaultValues: { ...defaultProjetAjoutValues(), priorite: defaultPriorite },
   });
 
-  const { register, handleSubmit, reset, formState } = form;
+  const { register, handleSubmit, reset, control, formState } = form;
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -570,7 +575,19 @@ export function ProjetTable({
           <label className={styles.formLabel} htmlFor="pt-date">
             Date cible
           </label>
-          <input id="pt-date" type="month" className={styles.formInput} {...register("date")} />
+          <Controller
+            control={control}
+            name="date"
+            render={({ field }) => (
+              <MonthPicker
+                id="pt-date"
+                value={field.value}
+                onChange={field.onChange}
+                minMois={moisCourantStr()}
+                ariaLabel="Date cible du nouveau projet"
+              />
+            )}
+          />
           {formState.errors.date ? <p className={styles.formError}>{formState.errors.date.message}</p> : null}
         </div>
         <div className={styles.formField}>

@@ -38,10 +38,10 @@ function badgeStatutLabel(s: Echeance["statut"]): string {
 export function EcheancesWidget({ echeances, onTerminerProjet }: EcheancesWidgetProps) {
   const [confirmId, setConfirmId] = useState<string | null>(null);
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <h2 className="text-sm font-semibold text-slate-800">Échéances à venir</h2>
-      <p className="mt-0.5 text-xs text-slate-500">Abonnements, projets et renouvellements les plus urgents</p>
-      <ul className="mt-4 divide-y divide-slate-100">
+    <div className="mz-card p-5">
+      <h2 className="text-sm font-semibold text-[var(--mz-ink)]">Échéances à venir</h2>
+      <p className="mt-0.5 text-xs text-[var(--mz-ink-muted)]">Abonnements, projets et renouvellements les plus urgents</p>
+      <ul className="mt-4 divide-y divide-[#E0E8E4]">
         {echeances.map((e) => (
           <li key={e.id} className="flex gap-3 py-3 first:pt-0">
             <span className={cn("mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full", pointCouleur(e))} aria-hidden />

@@ -29,7 +29,7 @@ export function Header({ foyerName = "Foyer Finance" }: HeaderProps) {
   const isLoading = loadingRevenus || loadingCharges;
 
   return (
-    <header className="border-b border-slate-200 bg-slate-800 text-white">
+    <header className="bg-(--mz-ink) text-white">
       <div className="flex items-center justify-between gap-4 px-4 py-4 md:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <NavMobile />
@@ -38,21 +38,21 @@ export function Header({ foyerName = "Foyer Finance" }: HeaderProps) {
           </div>
           <div className="hidden md:block">
             <h1 className="text-lg font-bold tracking-tight">{foyerName}</h1>
-            <p className="text-xs text-slate-400">Vue d&apos;ensemble</p>
+            <p className="text-xs text-white/45">Vue d&apos;ensemble</p>
           </div>
         </div>
         <div className="flex items-center gap-4 sm:gap-6">
           <div className="hidden text-right text-sm sm:block">
-            <p className="text-[10px] uppercase tracking-wide text-slate-400">Revenus</p>
-            <p className="font-bold text-emerald-400">{isLoading ? "—" : formatEur(totalRevenus)}</p>
+            <p className="text-[10px] uppercase tracking-wider text-white/45">Revenus</p>
+            <p className="font-semibold text-(--mz-green-light)">{isLoading ? "—" : formatEur(totalRevenus)}</p>
           </div>
           <div className="hidden text-right text-sm sm:block">
-            <p className="text-[10px] uppercase tracking-wide text-slate-400">Charges</p>
-            <p className="font-bold text-rose-400">{isLoading ? "—" : formatEur(totalCharges)}</p>
+            <p className="text-[10px] uppercase tracking-wider text-white/45">Charges</p>
+            <p className="font-semibold text-[#F09595]">{isLoading ? "—" : formatEur(totalCharges)}</p>
           </div>
           <div className="text-right text-sm">
-            <p className="text-[10px] uppercase tracking-wide text-slate-400">Solde</p>
-            <p className={`font-bold ${solde >= 0 ? "text-indigo-300" : "text-rose-400"}`}>
+            <p className="text-[10px] uppercase tracking-wider text-white/45">Solde</p>
+            <p className={`font-semibold ${solde >= 0 ? "text-(--mz-green-light)" : "text-[#F09595]"}`}>
               {isLoading ? "—" : formatEur(solde)}
             </p>
           </div>

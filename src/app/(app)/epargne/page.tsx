@@ -3,8 +3,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { Check } from "lucide-react";
 import { AllocationBanner } from "@/components/epargne/AllocationBanner";
+import { Echeancier } from "@/components/epargne/Echeancier";
 import { EpargneMetrics } from "@/components/epargne/EpargneMetrics";
-import { PlanActionCard } from "@/components/epargne/PlanActionCard";
 import { ProjetTable } from "@/components/epargne/ProjetTable";
 import { ProjetTimeline } from "@/components/epargne/ProjetTimeline";
 import { SoldeCumuleChart } from "@/components/epargne/SoldeCumuleChart";
@@ -78,9 +78,12 @@ export default function EpargnePage() {
       projetsFinances: projetsAlloues.filter((p) => p.statutAllocation === "finance").length,
       projetUrgent: projetsAlloues.find((p) => p.urgence === "urgent"),
       totalObjectifs: projetsEffectifs.reduce((s, p) => s + p.montant, 0),
+      epargneTotaleRequise: projetsAlloues.reduce((s, p) => s + p.epargneMensuelleRequise, 0),
     }),
     [projetsAlloues, projetsEffectifs],
   );
+
+  const resteAVivreMensuel = useMemo(() => resteAVivre(0), []);
 
   const pointsSolde = useMemo(
     () => projeterSolde(projetsEffectifs, soldeReel, EPARGNE_MENSUELLE, 24),
@@ -203,7 +206,12 @@ export default function EpargnePage() {
         <SoldeCumuleChart points={pointsSolde} />
       </div>
 
-      <PlanActionCard projetsAlloues={projetsAlloues} />
+      <Echeancier
+        projets={projetsAlloues}
+        soldeInitial={soldeReel}
+        resteAVivre={resteAVivreMensuel}
+        epargneMensuelleRecommandee={stats.epargneTotaleRequise}
+      />
 
       {projetsTermines.length > 0 ? (
         <details className={styles.termines}>

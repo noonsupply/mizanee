@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/components/ui/utils";
@@ -20,14 +21,20 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-56 shrink-0 flex-col border-r border-slate-200 bg-white md:flex">
-      <div className="px-4 py-5">
-        <Link href="/dashboard" className="text-lg font-bold tracking-tight text-slate-900">
-          Foyer Finance
+    <aside className="hidden w-56 shrink-0 flex-col bg-(--mz-ink) md:flex">
+      <div className="px-5 py-6">
+        <Link href="/dashboard" className="inline-flex items-center">
+          <Image
+            src="/logo/mizanee-white.svg"
+            alt="Mizanee"
+            width={120}
+            height={28}
+            className="h-7 w-auto"
+            priority
+          />
         </Link>
-        <p className="mt-0.5 text-xs text-slate-500">Budget du foyer</p>
       </div>
-      <nav className="flex flex-1 flex-col gap-0.5 px-2 pb-4">
+      <nav className="flex flex-1 flex-col gap-0.5 px-3 pb-4">
         {links.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
           return (
@@ -35,11 +42,13 @@ export function Sidebar() {
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                active ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+                "flex items-center gap-3 rounded-(--mz-radius-md) px-3 py-2.5 text-sm font-medium transition-colors",
+                active
+                  ? "bg-(--mz-green) text-white"
+                  : "text-white/60 hover:bg-white/10 hover:text-white/90",
               )}
             >
-              <Icon className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
+              <Icon className="h-4 w-4 shrink-0" aria-hidden />
               {label}
             </Link>
           );

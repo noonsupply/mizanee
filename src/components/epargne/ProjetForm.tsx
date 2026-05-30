@@ -13,7 +13,7 @@ import {
 } from "@/lib/validations-projets";
 import type { Projet, StatutProjet } from "@/types/projets";
 
-const COULEURS_DEFAUT = ["#7F77DD", "#1D9E75", "#D85A30", "#378ADD", "#D4537E", "#EF9F27", "#5DCAA5"] as const;
+const COULEURS_DEFAUT = ["#0F6E56", "#1D9E75", "#D85A30", "#378ADD", "#D4537E", "#EF9F27", "#5DCAA5"] as const;
 
 function nouvelIdProjet(): string {
   if (typeof globalThis.crypto !== "undefined" && "randomUUID" in globalThis.crypto) {
@@ -27,7 +27,7 @@ function nouvelIdProjet(): string {
 function couleurPourSeed(seed: string): string {
   let h = 0;
   for (let i = 0; i < seed.length; i += 1) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  return COULEURS_DEFAUT[h % COULEURS_DEFAUT.length] ?? "#7F77DD";
+  return COULEURS_DEFAUT[h % COULEURS_DEFAUT.length] ?? "#0F6E56";
 }
 
 export interface ProjetFormProps {

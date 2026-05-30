@@ -1,0 +1,463 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel {
+  border-radius: 0.75rem;
+  border: 1px solid rgb(226 232 240);
+  background: white;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
+}
+
+.panelHead {
+  margin-bottom: 12px;
+}
+
+.panelTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgb(15 23 42);
+}
+
+.panelSub {
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgb(100 116 139);
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.inputWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.input {
+  width: 140px;
+  padding: 10px 28px 10px 12px;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgb(15 23 42);
+  border: 1px solid rgb(203 213 225);
+  border-radius: 8px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--mz-green);
+  box-shadow: 0 0 0 3px rgba(15, 110, 86, 0.12);
+}
+
+.inputSuffix {
+  position: absolute;
+  right: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgb(100 116 139);
+  pointer-events: none;
+}
+
+.dispo {
+  font-size: 13px;
+  color: rgb(100 116 139);
+}
+
+.raccourcis {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(51 65 85);
+  background: rgb(248 250 252);
+  border: 1px solid rgb(226 232 240);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.chip:hover {
+  background: rgb(241 245 249);
+}
+
+.chipReco {
+  border-color: var(--mz-green);
+  color: var(--mz-green-deep);
+}
+
+.chipActif {
+  background: var(--mz-green-bg);
+  border-color: var(--mz-green);
+}
+
+.chipTag {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--mz-green);
+}
+
+.banner {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  border: 1px solid;
+}
+
+.bannerRed {
+  background: rgb(255 241 242);
+  color: rgb(159 18 57);
+  border-color: rgb(254 205 211);
+}
+
+.bannerAmber {
+  background: rgb(255 251 235);
+  color: rgb(146 64 14);
+  border-color: rgb(253 230 138);
+}
+
+.bannerGreen {
+  background: rgb(236 253 245);
+  color: rgb(6 95 70);
+  border-color: rgb(167 243 208);
+}
+
+.summaryRow {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  background: rgb(248 250 252);
+  border-radius: 8px;
+}
+
+.summaryLabel {
+  font-size: 11px;
+  color: rgb(100 116 139);
+}
+
+.summaryValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgb(15 23 42);
+}
+
+/* Timeline */
+.timeline {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 88px 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 8px;
+  border-top: 1px solid rgb(241 245 249);
+  font-size: 13px;
+}
+
+.row:first-child {
+  border-top: none;
+}
+
+.rowToday {
+  background: var(--mz-green-bg);
+  border-radius: 8px;
+}
+
+.mois {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  color: rgb(71 85 105);
+}
+
+.moisToday {
+  color: var(--mz-green);
+}
+
+.rowLabel {
+  color: rgb(100 116 139);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.epargne {
+  font-weight: 700;
+  color: rgb(29 158 117);
+  white-space: nowrap;
+}
+
+.epargneAmber {
+  color: rgb(180 83 9);
+}
+
+.solde {
+  font-size: 12px;
+  color: rgb(100 116 139);
+  white-space: nowrap;
+}
+
+/* Deadline */
+.deadlineRow {
+  margin: 6px 0;
+  padding: 12px;
+  background: rgb(255 251 235 / 0.6);
+  border: 1px solid rgb(253 230 138);
+  border-radius: 10px;
+}
+
+.deadlineHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.moisDeadline {
+  font-weight: 700;
+  color: rgb(15 23 42);
+}
+
+.badgeDeadline {
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 9999px;
+  background: rgb(254 243 199);
+  color: rgb(146 64 14);
+  border: 1px solid rgb(253 230 138);
+}
+
+.deadlineHead .epargne {
+  margin-left: auto;
+}
+
+.deadlineProjets {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.projet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.projetOk {
+  background: rgb(236 253 245);
+}
+
+.projetKo {
+  background: rgb(255 241 242);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.projetLabel {
+  font-weight: 600;
+  color: rgb(30 41 59);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.projetMontant {
+  font-weight: 600;
+  color: rgb(51 65 85);
+  white-space: nowrap;
+}
+
+.projetStatut {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.projetOk .projetStatut {
+  color: rgb(6 95 70);
+}
+
+.projetKo .projetStatut {
+  color: rgb(159 18 57);
+}
+
+.soldeApres {
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(71 85 105);
+}
+
+/* Résumé */
+.resume {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgb(241 245 249);
+}
+
+.resumeTitle {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgb(100 116 139);
+  margin-bottom: 8px;
+}
+
+.resumeLine {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.resumeLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(30 41 59);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resumeMeta {
+  font-size: 12px;
+  color: rgb(100 116 139);
+  white-space: nowrap;
+}
+
+.resumeBadge {
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.resumeOk {
+  background: rgb(236 253 245);
+  color: rgb(6 95 70);
+  border-color: rgb(167 243 208);
+}
+
+.resumeRisque {
+  background: rgb(255 251 235);
+  color: rgb(146 64 14);
+  border-color: rgb(253 230 138);
+}
+
+.empty {
+  padding: 24px 0;
+  text-align: center;
+  font-size: 13px;
+  color: rgb(148 163 184);
+}
+
+@media (max-width: 600px) {
+  .input {
+    width: 100%;
+  }
+
+  .inputWrap {
+    flex: 1;
+    width: 100%;
+  }
+
+  .inputRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dispo {
+    text-align: center;
+  }
+
+  .chip {
+    flex: 1;
+    min-width: calc(50% - 4px);
+    justify-content: center;
+  }
+
+  .summaryRow {
+    grid-template-columns: 1fr;
+  }
+
+  .row {
+    grid-template-columns: 72px 1fr auto;
+  }
+
+  .solde {
+    display: none;
+  }
+
+  .rowToday .solde,
+  .row:last-child .solde {
+    display: none;
+  }
+
+  .deadlineProjets .projet {
+    flex-wrap: wrap;
+  }
+
+  .resumeLine {
+    flex-wrap: wrap;
+  }
+
+  .resumeMeta {
+    width: 100%;
+    order: 3;
+    padding-left: 18px;
+  }
+}

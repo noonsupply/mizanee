@@ -57,7 +57,7 @@
   display: inline-block;
   margin-top: 4px;
   font-size: 11px;
-  color: rgb(127 119 221);
+  color: var(--mz-green);
   text-decoration: none;
 }
 

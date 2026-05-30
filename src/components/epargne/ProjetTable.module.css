@@ -261,14 +261,14 @@
   font-size: 13px;
   font-weight: 600;
   color: white;
-  background: #7f77dd;
+  background: var(--mz-green);
   border: none;
   border-radius: 6px;
   cursor: pointer;
 }
 
 .editSave:hover {
-  background: #6b63c9;
+  background: var(--mz-green-deep);
 }
 
 .editSave:disabled {
@@ -327,7 +327,7 @@
   font-size: 13px;
   font-weight: 600;
   color: white;
-  background: #7f77dd;
+  background: var(--mz-green);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -335,7 +335,7 @@
 }
 
 .addBtn:hover {
-  background: #6b63c9;
+  background: var(--mz-green-deep);
 }
 
 .addBtn:disabled {
@@ -423,6 +423,17 @@
     font-size: 11px;
     color: rgb(100 116 139);
     margin-right: 4px;
+  }
+
+  .cardDateField {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .cardDateField label {
+    flex-shrink: 0;
   }
 
   .cardProgress {
